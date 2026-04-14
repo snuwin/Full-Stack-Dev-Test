@@ -1,0 +1,112 @@
+[
+  {
+    "jobType": "diagnostic",
+    "level": "standard",
+    "hourlyRate": 95,
+    "estimatedHours": {
+      "min": 0.5,
+      "max": 1.5
+    },
+    "_midpointHours": 1.0
+  },
+  {
+    "jobType": "diagnostic",
+    "level": "complex",
+    "hourlyRate": 125,
+    "estimatedHours": {
+      "min": 1,
+      "max": 3
+    },
+    "_midpointHours": 2.0
+  },
+  {
+    "jobType": "repair",
+    "level": "minor",
+    "hourlyRate": 110,
+    "estimatedHours": {
+      "min": 0.5,
+      "max": 2
+    },
+    "_midpointHours": 1.2
+  },
+  {
+    "jobType": "repair",
+    "level": "major",
+    "hourlyRate": 135,
+    "estimatedHours": {
+      "min": 2,
+      "max": 6
+    },
+    "_midpointHours": 4.0
+  },
+  {
+    "jobType": "install",
+    "level": "residential",
+    "hourlyRate": 150,
+    "estimatedHours": {
+      "min": 4,
+      "max": 8
+    },
+    "_midpointHours": 6.0
+  },
+  {
+    "jobType": "install",
+    "level": "commercial",
+    "hourlyRate": 185,
+    "estimatedHours": {
+      "min": 6,
+      "max": 16
+    },
+    "_midpointHours": 11.0
+  },
+  {
+    "jobType": "install",
+    "level": "mini-split",
+    "hourlyRate": 140,
+    "estimatedHours": {
+      "min": 3,
+      "max": 6
+    },
+    "_midpointHours": 4.5
+  },
+  {
+    "jobType": "maintenance",
+    "level": "standard",
+    "hourlyRate": 85,
+    "estimatedHours": {
+      "min": 1,
+      "max": 2
+    },
+    "_midpointHours": 1.5
+  },
+  {
+    "jobType": "maintenance",
+    "level": "comprehensive",
+    "hourlyRate": 110,
+    "estimatedHours": {
+      "min": 2,
+      "max": 4
+    },
+    "_midpointHours": 3.0
+  },
+  {
+    "jobType": "ductwork",
+    "level": "repair",
+    "hourlyRate": 120,
+    "estimatedHours": {
+      "min": 2,
+      "max": 5
+    },
+    "_midpointHours": 3.5
+  },
+  {
+    "jobType": "ductwork",
+    "level": "new-install",
+    "hourlyRate": 145,
+    "estimatedHours": {
+      "min": 8,
+      "max": 20
+    },
+    "_midpointHours": 14.0
+  }
+]

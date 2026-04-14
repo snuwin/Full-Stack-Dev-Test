@@ -1,0 +1,31 @@
+{
+  "normalizedAt": "2026-04-14T18:30:19Z",
+  "counts": {
+    "customers": 10,
+    "equipment": 30,
+    "laborRates": 11
+  },
+  "taxRate": 0.0875,
+  "markupConfig": {
+    "Air Conditioner": 0.3,
+    "Heat Pump": 0.3,
+    "Furnace": 0.3,
+    "Rooftop Unit": 0.25,
+    "Package Unit": 0.25,
+    "Mini-Split": 0.3,
+    "Compressor": 0.4,
+    "Motor": 0.4,
+    "Coil": 0.38,
+    "Thermostat": 0.45,
+    "Capacitor": 0.5,
+    "Gas Valve": 0.38,
+    "Control Board": 0.4,
+    "Ignitor": 0.45,
+    "Air Handler": 0.3,
+    "Humidifier": 0.35,
+    "Air Cleaner": 0.35,
+    "Air Purifier": 0.35
+  },
+  "issueCount": 8,
+  "autoFixCount": 4
+}

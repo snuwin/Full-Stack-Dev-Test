@@ -1,0 +1,302 @@
+[
+  {
+    "id": "EQ001",
+    "name": "Carrier Comfort 16 Central AC",
+    "category": "Air Conditioner",
+    "brand": "Carrier",
+    "modelNumber": "24ACC636A003",
+    "baseCost": 3200.0,
+    "_retailPrice": 4160.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ002",
+    "name": "Trane XR15 Heat Pump",
+    "category": "Heat Pump",
+    "brand": "Trane",
+    "modelNumber": "4TWR5036N1000A",
+    "baseCost": 4100.0,
+    "_retailPrice": 5330.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ003",
+    "name": "Lennox SL280V Gas Furnace",
+    "category": "Furnace",
+    "brand": "Lennox",
+    "modelNumber": "SL280UH070V36A",
+    "baseCost": 2800.0,
+    "_retailPrice": 3640.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ004",
+    "name": "Rheem Classic Plus Air Handler",
+    "category": "Air Handler",
+    "brand": "Rheem",
+    "modelNumber": "RH1T3617STANJA",
+    "baseCost": 1450.0,
+    "_retailPrice": 1885.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ005",
+    "name": "Mitsubishi Ductless Mini-Split 12K BTU",
+    "category": "Mini-Split",
+    "brand": "Mitsubishi",
+    "modelNumber": "MSZ-GL12NA",
+    "baseCost": 3600.0,
+    "_retailPrice": 4680.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ006",
+    "name": "Daikin 18K BTU Multi-Zone Mini-Split",
+    "category": "Mini-Split",
+    "brand": "Daikin",
+    "modelNumber": "MXS218NMVJU",
+    "baseCost": 5200.0,
+    "_retailPrice": 6760.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ007",
+    "name": "York 5-Ton Rooftop Unit",
+    "category": "Rooftop Unit",
+    "brand": "York",
+    "modelNumber": "ZF060N12D2A1AAA1A1",
+    "baseCost": 8900.0,
+    "_retailPrice": 11125.0,
+    "_markupPct": 0.25
+  },
+  {
+    "id": "EQ008",
+    "name": "Carrier 48LC Package Unit",
+    "category": "Package Unit",
+    "brand": "Carrier",
+    "modelNumber": "48LC-A060090",
+    "baseCost": 7200.0,
+    "_retailPrice": 9000.0,
+    "_markupPct": 0.25
+  },
+  {
+    "id": "EQ009",
+    "name": "Goodman 3-Ton Central AC",
+    "category": "Air Conditioner",
+    "brand": "Goodman",
+    "modelNumber": "GSX140361",
+    "baseCost": 2400.0,
+    "_retailPrice": 3120.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ010",
+    "name": "Bryant Legacy Line Furnace 80%",
+    "category": "Furnace",
+    "brand": "Bryant",
+    "modelNumber": "315AAV048080",
+    "baseCost": 1900.0,
+    "_retailPrice": 2470.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ011",
+    "name": "Copeland Scroll Compressor 3-Ton",
+    "category": "Compressor",
+    "brand": "Copeland",
+    "modelNumber": "ZR36K5E-PFV",
+    "baseCost": 850.0,
+    "_retailPrice": 1190.0,
+    "_markupPct": 0.4
+  },
+  {
+    "id": "EQ012",
+    "name": "US Motors 1/2 HP Blower Motor",
+    "category": "Motor",
+    "brand": "US Motors",
+    "modelNumber": "5462",
+    "baseCost": 275.0,
+    "_retailPrice": 385.0,
+    "_markupPct": 0.4
+  },
+  {
+    "id": "EQ013",
+    "name": "Emerson 1/4 HP Condenser Fan Motor",
+    "category": "Motor",
+    "brand": "Emerson",
+    "modelNumber": "KA55HXHMP-8657",
+    "baseCost": 185.0,
+    "_retailPrice": 259.0,
+    "_markupPct": 0.4
+  },
+  {
+    "id": "EQ014",
+    "name": "Carrier Evaporator Coil - 3 Ton",
+    "category": "Coil",
+    "brand": "Carrier",
+    "modelNumber": "CNPVP3617ALA",
+    "baseCost": 620.0,
+    "_retailPrice": 855.6,
+    "_markupPct": 0.38
+  },
+  {
+    "id": "EQ015",
+    "name": "Goodman Condenser Coil Assembly",
+    "category": "Coil",
+    "brand": "Goodman",
+    "modelNumber": "0270A01108",
+    "baseCost": 540.0,
+    "_retailPrice": 745.2,
+    "_markupPct": 0.38
+  },
+  {
+    "id": "EQ016",
+    "name": "Honeywell T6 Pro Thermostat",
+    "category": "Thermostat",
+    "brand": "Honeywell",
+    "modelNumber": "TH6220U2000",
+    "baseCost": 165.0,
+    "_retailPrice": 239.25,
+    "_markupPct": 0.45
+  },
+  {
+    "id": "EQ017",
+    "name": "Ecobee SmartThermostat Premium",
+    "category": "Thermostat",
+    "brand": "ecobee",
+    "modelNumber": "EB-STATE5P-01",
+    "baseCost": 250.0,
+    "_retailPrice": 362.5,
+    "_markupPct": 0.45
+  },
+  {
+    "id": "EQ018",
+    "name": "Turbo 200 Multi-Tap Run Capacitor",
+    "category": "Capacitor",
+    "brand": "Turbo",
+    "modelNumber": "QUPC-T200",
+    "baseCost": 32.0,
+    "_retailPrice": 48.0,
+    "_markupPct": 0.5
+  },
+  {
+    "id": "EQ019",
+    "name": "Supco Hard Start Kit",
+    "category": "Capacitor",
+    "brand": "Supco",
+    "modelNumber": "SPP6",
+    "baseCost": 28.0,
+    "_retailPrice": 42.0,
+    "_markupPct": 0.5
+  },
+  {
+    "id": "EQ020",
+    "name": "White-Rodgers 24V Gas Valve",
+    "category": "Gas Valve",
+    "brand": "White-Rodgers",
+    "modelNumber": "36J24-214",
+    "baseCost": 145.0,
+    "_retailPrice": 200.1,
+    "_markupPct": 0.38
+  },
+  {
+    "id": "EQ021",
+    "name": "Honeywell SmartValve Control",
+    "category": "Gas Valve",
+    "brand": "Honeywell",
+    "modelNumber": "SV9641M4510",
+    "baseCost": 310.0,
+    "_retailPrice": 427.8,
+    "_markupPct": 0.38
+  },
+  {
+    "id": "EQ022",
+    "name": "ICM Controls Furnace Control Board",
+    "category": "Control Board",
+    "brand": "ICM",
+    "modelNumber": "ICM282A",
+    "baseCost": 95.0,
+    "_retailPrice": 133.0,
+    "_markupPct": 0.4
+  },
+  {
+    "id": "EQ023",
+    "name": "Carrier OEM Ignitor",
+    "category": "Ignitor",
+    "brand": "Carrier",
+    "modelNumber": "LH33ZS004",
+    "baseCost": 45.0,
+    "_retailPrice": 65.25,
+    "_markupPct": 0.45
+  },
+  {
+    "id": "EQ024",
+    "name": "Trane 4-Ton Heat Pump",
+    "category": "Heat Pump",
+    "brand": "Trane",
+    "modelNumber": "4TWR5048N1000B",
+    "baseCost": 4800.0,
+    "_retailPrice": 6240.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ025",
+    "name": "Lennox XC21 Variable Speed AC",
+    "category": "Air Conditioner",
+    "brand": "Lennox",
+    "modelNumber": "XC21-036-230",
+    "baseCost": 5800.0,
+    "_retailPrice": 7540.0,
+    "_markupPct": 0.3
+  },
+  {
+    "id": "EQ026",
+    "name": "Aprilaire 600 Humidifier",
+    "category": "Humidifier",
+    "brand": "Aprilaire",
+    "modelNumber": "600M",
+    "baseCost": 290.0,
+    "_retailPrice": 391.5,
+    "_markupPct": 0.35
+  },
+  {
+    "id": "EQ027",
+    "name": "Honeywell F100 Media Air Cleaner",
+    "category": "Air Cleaner",
+    "brand": "Honeywell",
+    "modelNumber": "F100F2010",
+    "baseCost": 420.0,
+    "_retailPrice": 567.0,
+    "_markupPct": 0.35
+  },
+  {
+    "id": "EQ028",
+    "name": "Fresh-Aire UV APCO Whole-House Air Purifier",
+    "category": "Air Purifier",
+    "brand": "Fresh-Aire UV",
+    "modelNumber": "TUV-APCO-SI2",
+    "baseCost": 680.0,
+    "_retailPrice": 918.0,
+    "_markupPct": 0.35
+  },
+  {
+    "id": "EQ029",
+    "name": "Regal Beloit ECM Blower Motor 3/4 HP",
+    "category": "Motor",
+    "brand": "Regal Beloit",
+    "modelNumber": "5SME39SL0253",
+    "baseCost": 650.0,
+    "_retailPrice": 910.0,
+    "_markupPct": 0.4
+  },
+  {
+    "id": "EQ030",
+    "name": "Copeland Scroll Compressor 5-Ton",
+    "category": "Compressor",
+    "brand": "Copeland",
+    "modelNumber": "ZR61K3E-PFV",
+    "baseCost": 1350.0,
+    "_retailPrice": 1890.0,
+    "_markupPct": 0.4
+  }
+]

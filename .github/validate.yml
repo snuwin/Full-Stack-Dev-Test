@@ -1,0 +1,40 @@
+name: Validate data pipeline
+
+on:
+  push:
+    paths:
+      - 'data/*.json'
+      - 'normalize_data.py'
+  pull_request:
+    paths:
+      - 'data/*.json'
+      - 'normalize_data.py'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate data (no writes)
+        run: python normalize_data.py --validate-only --strict
+
+      # If validation passes, generate clean data and upload as a build artifact.
+      # In a real deployment you'd push data/clean/ to a CDN or static host here.
+      - name: Generate clean data
+        if: success()
+        run: python normalize_data.py --output-dir data/clean
+
+      - name: Upload clean data artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-data
+          path: data/clean/
+          retention-days: 30

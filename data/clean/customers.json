@@ -1,0 +1,118 @@
+[
+  {
+    "id": "CUST001",
+    "name": "Margaret Thompson",
+    "address": "4821 Oakridge Dr, Springfield, IL 62704",
+    "phone": "(217) 555-0142",
+    "propertyType": "residential",
+    "squareFootage": 2200,
+    "systemType": "Central AC + Gas Furnace",
+    "systemAge": 12,
+    "lastServiceDate": "2025-08-14",
+    "_replacementCandidate": false
+  },
+  {
+    "id": "CUST002",
+    "name": "Dave & Linda Kowalski",
+    "address": "1130 W Maple Ave, Springfield, IL 62711",
+    "phone": "(217) 555-0287",
+    "propertyType": "residential",
+    "squareFootage": 1800,
+    "systemType": "Heat Pump",
+    "systemAge": 8,
+    "lastServiceDate": "2026-01-22",
+    "_replacementCandidate": false
+  },
+  {
+    "id": "CUST003",
+    "name": "Sunrise Medical Group",
+    "address": "900 N First St, Suite 200, Springfield, IL 62702",
+    "phone": "(217) 555-0391",
+    "propertyType": "commercial",
+    "squareFootage": 8500,
+    "systemType": "Rooftop Units (x3)",
+    "systemAge": 6,
+    "_replacementCandidate": false
+  },
+  {
+    "id": "CUST004",
+    "name": "Rick Alvarez",
+    "address": "207 S Park Blvd, Chatham, IL 62629",
+    "phone": "(217) 555-0104",
+    "propertyType": "residential",
+    "squareFootage": 3100,
+    "systemType": "Dual Zone - Central AC + Mini-Split",
+    "systemAge": 3,
+    "lastServiceDate": "2025-11-30",
+    "_replacementCandidate": false
+  },
+  {
+    "id": "CUST005",
+    "name": "Springfield Community Church",
+    "address": "445 E Monroe St, Springfield, IL 62701",
+    "propertyType": "commercial",
+    "squareFootage": 12000,
+    "systemType": "Package Unit + Rooftop Unit",
+    "systemAge": 18,
+    "lastServiceDate": "2024-06-10",
+    "_replacementCandidate": true
+  },
+  {
+    "id": "CUST006",
+    "name": "Patricia Nguyen",
+    "address": "3388 Westchester Ln, Rochester, IL 62563",
+    "phone": "(217) 555-0456",
+    "propertyType": "residential",
+    "squareFootage": 1400,
+    "systemType": "Central AC + Gas Furnace",
+    "systemAge": 22,
+    "lastServiceDate": "2025-03-08",
+    "_replacementCandidate": true
+  },
+  {
+    "id": "CUST007",
+    "name": "Brewed Awakening Coffee",
+    "address": "112 S 5th St, Springfield, IL 62701",
+    "phone": "(217) 555-0519",
+    "propertyType": "commercial",
+    "squareFootage": 1600,
+    "systemType": "Mini-Split (x2)",
+    "_replacementCandidate": false
+  },
+  {
+    "id": "CUST008",
+    "name": "James & Tonya Mitchell",
+    "address": "5602 Brickstone Ct, Springfield, IL 62712",
+    "phone": "(217) 555-0633",
+    "systemType": "Central AC + Gas Furnace",
+    "systemAge": 15,
+    "lastServiceDate": "2025-09-17",
+    "propertyType": "residential",
+    "squareFootage": 2750,
+    "_replacementCandidate": true
+  },
+  {
+    "id": "CUST009",
+    "name": "Capital City Auto Body",
+    "address": "2901 Stevenson Dr, Springfield, IL 62703",
+    "phone": "(217) 555-0781",
+    "propertyType": "commercial",
+    "squareFootage": 6200,
+    "systemType": "Rooftop Unit + Gas Heaters",
+    "systemAge": 10,
+    "lastServiceDate": "2026-02-05",
+    "_replacementCandidate": false
+  },
+  {
+    "id": "CUST010",
+    "name": "Helen Park",
+    "address": "819 Illini Rd, Sherman, IL 62684",
+    "phone": "(217) 555-0845",
+    "propertyType": "residential",
+    "squareFootage": 1950,
+    "systemType": "Heat Pump",
+    "systemAge": 5,
+    "lastServiceDate": "2025-12-01",
+    "_replacementCandidate": false
+  }
+]
