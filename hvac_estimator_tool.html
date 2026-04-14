@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HVAC Field Estimator</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❄️</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a7a56;
+    --green-light: #e8f5f0;
+    --green-mid: #2ea876;
+    --green-dark: #0f5038;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --blue: #1d4ed8;
+    --blue-light: #eff6ff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--gray-100);
+    color: var(--gray-900);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--gray-900);
+    color: white;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 12px;
+  }
+  .app-header-left { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .app-logo {
+    width: 32px; height: 32px;
+    background: var(--green-mid);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .app-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .app-sub { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .freshness-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gray-500);
+    background: rgba(255,255,255,0.07);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .freshness-badge.stale { color: #fbbf24; }
+  .header-tab {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-400);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    background: none;
+    font-family: var(--font);
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .header-tab:hover { color: white; background: rgba(255,255,255,0.1); }
+  .header-tab.active { color: white; background: rgba(255,255,255,0.15); }
+
+  /* ── LOADING ── */
+  .loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 14px;
+    color: var(--gray-400);
+    font-size: 14px;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--green-mid);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .load-error {
+    background: var(--red-light);
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    color: #991b1b;
+    font-size: 13px;
+    max-width: 420px;
+    margin: 40px auto;
+  }
+  .load-error strong { display: block; margin-bottom: 6px; }
+  .load-error code { font-family: var(--mono); font-size: 12px; background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; }
+
+  /* ── LAYOUT ── */
+  .app-body { max-width: 680px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  /* ── STEPS ── */
+  .steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+    background: white;
+    border-radius: var(--radius);
+    padding: 4px;
+    box-shadow: var(--shadow-sm);
+    gap: 2px;
+  }
+  .step-btn {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    gap: 7px;
+    padding: 9px 6px;
+    border-radius: 7px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-400);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .step-btn.active { background: var(--gray-900); color: white; }
+  .step-btn.done { color: var(--green-dark); background: var(--green-light); cursor: pointer; }
+  .step-btn.done:hover { background: #d1ebe2; }
+  .step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.2;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    color: inherit; flex-shrink: 0;
+  }
+  .step-btn.active .step-num { opacity: 1; background: rgba(255,255,255,0.2); color: white; }
+  .step-btn.done .step-num { opacity: 1; background: var(--green-mid); color: white; }
+  .step-label { display: none; }
+  @media(min-width: 420px) { .step-label { display: inline; } }
+
+  /* ── PANELS ── */
+  .panel {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 14px 16px 0;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--gray-400);
+    margin-bottom: 12px;
+  }
+  .panel-body { padding: 0 16px 16px; }
+
+  /* ── INPUTS ── */
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    transition: border-color 0.12s, box-shadow 0.12s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(46,168,118,0.12);
+    background: white;
+  }
+  textarea { resize: vertical; line-height: 1.6; min-height: 72px; }
+  select { cursor: pointer; }
+
+  /* ── CUSTOMER CARDS ── */
+  .c-card {
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    cursor: pointer;
+    margin-bottom: 7px;
+    transition: all 0.12s;
+    background: var(--gray-50);
+  }
+  .c-card:hover { border-color: var(--green-mid); background: white; }
+  .c-card.selected { border-color: var(--green); background: var(--green-light); }
+  .c-name { font-size: 14px; font-weight: 600; color: var(--gray-900); display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+  .c-detail { font-size: 12px; color: var(--gray-500); margin-top: 3px; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .badge-comm { background: var(--blue-light); color: var(--blue); }
+  .badge-old { background: var(--amber-light); color: var(--amber); }
+  .badge-warn { background: var(--red-light); color: var(--red); }
+  .badge-ok { background: var(--green-light); color: var(--green-dark); }
+
+  /* ── PROPERTY GRID ── */
+  .prop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .prop-box { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 10px 12px; }
+  .prop-label { font-size: 11px; color: var(--gray-400); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .prop-val { font-size: 14px; font-weight: 500; color: var(--gray-800); margin-top: 3px; }
+  .warn-box {
+    background: var(--amber-light); border: 1px solid #fcd34d;
+    border-radius: var(--radius-sm); padding: 10px 13px;
+    font-size: 13px; color: #92400e;
+    margin-top: 10px; display: flex; gap: 8px; align-items: flex-start;
+  }
+
+  /* ── DRAFT RESTORE BANNER ── */
+  .draft-banner {
+    background: var(--blue-light);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #1e40af;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .draft-banner-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .draft-banner button {
+    font-size: 12px; font-weight: 600; font-family: var(--font);
+    padding: 4px 10px; border-radius: var(--radius-sm); cursor: pointer; border: none;
+  }
+  .draft-restore { background: var(--blue); color: white; }
+  .draft-dismiss { background: transparent; color: #1e40af; border: 1px solid #93c5fd !important; }
+
+  /* ── CATEGORY PILLS ── */
+  .cat-scroll {
+    display: flex; gap: 6px;
+    overflow-x: auto; padding-bottom: 2px;
+    margin-bottom: 12px; scrollbar-width: none;
+  }
+  .cat-scroll::-webkit-scrollbar { display: none; }
+  .cat-pill {
+    padding: 5px 13px; border-radius: 20px;
+    border: 1.5px solid var(--gray-200); background: var(--gray-50);
+    font-size: 12px; font-weight: 500; color: var(--gray-600);
+    cursor: pointer; white-space: nowrap; transition: all 0.12s; flex-shrink: 0;
+  }
+  .cat-pill.active { background: var(--gray-900); border-color: var(--gray-900); color: white; }
+  .cat-pill:not(.active):hover { border-color: var(--gray-400); color: var(--gray-800); }
+
+  /* ── EQUIPMENT ROWS ── */
+  .e-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+  }
+  .e-row:last-child { border-bottom: none; }
+  .e-info { flex: 1; min-width: 0; }
+  .e-name { font-size: 13px; font-weight: 500; color: var(--gray-800); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .e-meta { font-size: 11px; color: var(--gray-400); font-family: var(--mono); margin-top: 2px; }
+  .e-price { font-size: 13px; font-weight: 600; color: var(--gray-700); min-width: 64px; text-align: right; flex-shrink: 0; }
+  .qty-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .qty-btn {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1.5px solid var(--gray-200); background: white;
+    font-size: 15px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gray-600); transition: all 0.12s;
+  }
+  .qty-btn:hover { border-color: var(--green-mid); color: var(--green); }
+  .qty-num { font-size: 14px; font-weight: 600; min-width: 20px; text-align: center; color: var(--gray-800); }
+  .add-btn {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--green); border: none; color: white;
+    font-size: 20px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.12s;
+  }
+  .add-btn:hover { background: var(--green-dark); }
+
+  /* ── LABOR ROWS ── */
+  .l-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--gray-100);
+  }
+  .l-row:last-child { border-bottom: none; }
+  .l-info { flex: 1; }
+  .l-name { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+  .l-rate { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .l-range {
+    font-size: 11px; color: var(--gray-400); font-family: var(--mono);
+    margin-top: 3px; background: var(--gray-100);
+    display: inline-block; padding: 2px 7px; border-radius: 4px;
+  }
+  .l-hrs-wrap { display: flex; align-items: center; gap: 6px; margin-top: 7px; }
+  .l-hrs-label { font-size: 12px; color: var(--gray-500); }
+  .hrs-input { width: 68px !important; height: 32px; padding: 0 10px; text-align: center; font-family: var(--mono); font-size: 13px; }
+  .l-total { font-size: 14px; font-weight: 600; color: var(--gray-700); min-width: 72px; text-align: right; padding-top: 3px; flex-shrink: 0; }
+
+  /* ── QUOTE STEP ── */
+  .metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .metric-box { background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 16px; }
+  .metric-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-400); }
+  .metric-val { font-size: 22px; font-weight: 600; color: var(--gray-900); margin-top: 4px; letter-spacing: -0.02em; }
+  .metric-val.green { color: var(--green); }
+
+  /* Margin selector row */
+  .margin-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+    margin-bottom: 4px;
+  }
+  .margin-row label { font-size: 13px; color: var(--gray-600); flex: 1; }
+  .margin-row select { width: auto; height: 32px; padding: 0 10px; font-size: 13px; }
+
+  .q-line {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--gray-100);
+  }
+  .q-line:last-child { border-bottom: none; }
+  .q-name { font-size: 13px; font-weight: 500; color: var(--gray-800); flex: 1; }
+  .q-sub { font-size: 11px; color: var(--gray-400); font-family: var(--mono); margin-top: 2px; }
+  .q-amt { font-size: 14px; font-weight: 600; color: var(--gray-800); min-width: 72px; text-align: right; }
+  .rm-btn {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid var(--gray-200); background: none;
+    font-size: 12px; color: var(--gray-400); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.12s;
+  }
+  .rm-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .totals-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: var(--gray-600); }
+  .totals-row.grand { font-size: 16px; font-weight: 700; color: var(--gray-900); border-top: 2px solid var(--gray-200); margin-top: 6px; padding-top: 10px; }
+
+  /* ── QUOTE HISTORY VIEW ── */
+  .history-empty { text-align: center; padding: 48px 20px; color: var(--gray-400); font-size: 14px; }
+  .history-empty p { margin-top: 8px; font-size: 13px; }
+  .h-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .h-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .h-customer { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+  .h-time { font-size: 11px; color: var(--gray-400); font-family: var(--mono); flex-shrink: 0; margin-top: 2px; }
+  .h-total { font-size: 18px; font-weight: 700; color: var(--green); }
+  .h-items { font-size: 12px; color: var(--gray-500); margin-top: 6px; }
+  .h-actions { display: flex; gap: 6px; margin-top: 10px; }
+  .h-btn {
+    font-size: 12px; font-weight: 500; padding: 5px 12px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    border: 1.5px solid var(--gray-200); background: var(--gray-50);
+    font-family: var(--font); color: var(--gray-700); transition: all 0.12s;
+  }
+  .h-btn:hover { border-color: var(--gray-300); background: white; }
+  .h-btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .clear-btn {
+    font-size: 12px; font-weight: 500; padding: 6px 14px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    border: 1.5px solid var(--gray-200); background: white;
+    font-family: var(--font); color: var(--red); transition: all 0.12s;
+    margin-bottom: 14px;
+  }
+  .clear-btn:hover { border-color: var(--red); background: var(--red-light); }
+
+  /* ── BUTTONS ── */
+  .action-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 20px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-200); background: white;
+    font-family: var(--font); font-size: 13px; font-weight: 600;
+    color: var(--gray-700); cursor: pointer; transition: all 0.12s;
+  }
+  .btn:hover { background: var(--gray-50); border-color: var(--gray-300); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-primary { background: var(--green); border-color: var(--green); color: white; }
+  .btn-primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
+  .btn-dark { background: var(--gray-900); border-color: var(--gray-900); color: white; }
+  .btn-dark:hover { background: var(--gray-700); border-color: var(--gray-700); }
+
+  .empty-state { text-align: center; padding: 28px; color: var(--gray-400); font-size: 13px; }
+
+  /* ── MODAL ── */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: white; border-radius: var(--radius);
+    padding: 24px; max-width: 560px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--gray-900); }
+  .quote-text {
+    font-family: var(--mono); font-size: 12px; line-height: 1.8;
+    white-space: pre-wrap; background: var(--gray-50);
+    border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+    padding: 16px; color: var(--gray-700);
+  }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+  mark { background: #fef08a; color: inherit; border-radius: 2px; }
+
+  /* ── SAVED INDICATOR ── */
+  .saved-dot {
+    display: inline-block; width: 7px; height: 7px;
+    border-radius: 50%; background: var(--green-mid);
+    margin-left: 6px; opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .saved-dot.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header-left">
+    <div class="app-logo">❄</div>
+    <div>
+      <div class="app-title">HVAC Field Estimator</div>
+      <div class="app-sub">Springfield &amp; Central IL</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="freshness-badge" id="freshness-badge" style="display:none"></div>
+    <button class="header-tab active" id="tab-estimate" onclick="showView('estimate')">Estimate</button>
+    <button class="header-tab" id="tab-history" onclick="showView('history')">
+      History <span class="saved-dot" id="saved-dot"></span>
+    </button>
+  </div>
+</header>
+
+<div class="app-body">
+
+  <!-- LOADING STATE -->
+  <div id="view-loading" class="loading-screen">
+    <div class="spinner"></div>
+    <div>Loading catalog…</div>
+  </div>
+
+  <!-- ESTIMATE VIEW -->
+  <div id="view-estimate" style="display:none">
+
+    <!-- Draft restore banner (shown when a saved draft exists) -->
+    <div class="draft-banner" id="draft-banner" style="display:none">
+      <span id="draft-banner-text">You have an unsaved draft. Restore it?</span>
+      <div class="draft-banner-actions">
+        <button class="draft-restore" onclick="restoreDraft()">Restore draft</button>
+        <button class="draft-dismiss" onclick="dismissDraft()">Start fresh</button>
+      </div>
+    </div>
+
+    <!-- STEP NAV -->
+    <div class="steps">
+      <button class="step-btn active" id="sn1" onclick="goStep(1)"><span class="step-num">1</span><span class="step-label">Customer</span></button>
+      <button class="step-btn"        id="sn2" onclick="goStep(2)"><span class="step-num">2</span><span class="step-label">Equipment</span></button>
+      <button class="step-btn"        id="sn3" onclick="goStep(3)"><span class="step-num">3</span><span class="step-label">Labor</span></button>
+      <button class="step-btn"        id="sn4" onclick="goStep(4)"><span class="step-num">4</span><span class="step-label">Quote</span></button>
+    </div>
+
+    <!-- STEP 1: CUSTOMER -->
+    <div id="step1">
+      <div class="panel">
+        <div class="panel-head">Find customer</div>
+        <div class="panel-body">
+          <input type="text" id="csearch" placeholder="Search by name, address, or phone…" oninput="renderCustomers()" style="margin-bottom:12px">
+          <div id="clist"></div>
+        </div>
+      </div>
+      <div class="panel" id="cdetail-panel" style="display:none">
+        <div class="panel-head">Property on file</div>
+        <div class="panel-body" id="cdetail"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-dark" id="btn-next1" onclick="goStep(2)" disabled>Continue to equipment →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: EQUIPMENT -->
+    <div id="step2" style="display:none">
+      <div class="panel">
+        <div class="panel-head">Equipment &amp; parts catalog</div>
+        <div class="panel-body">
+          <div class="cat-scroll" id="cat-tabs"></div>
+          <input type="text" id="esearch" placeholder="Search by name, brand, or model number…" oninput="renderEquip()" style="margin-bottom:12px">
+          <div id="elist"></div>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-dark" onclick="goStep(3)">Continue to labor →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: LABOR -->
+    <div id="step3" style="display:none">
+      <div class="panel">
+        <div class="panel-head">Labor charges</div>
+        <div class="panel-body" id="llist"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Tech notes (optional)</div>
+        <div class="panel-body">
+          <textarea id="tech-notes" placeholder="Describe what was done, any observations or recommendations…" oninput="saveDraft()"></textarea>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-dark" onclick="goStep(4)">Build quote →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: QUOTE -->
+    <div id="step4" style="display:none">
+      <div class="metric-row">
+        <div class="metric-box"><div class="metric-lbl">Parts</div><div class="metric-val" id="m-parts">$0</div></div>
+        <div class="metric-box"><div class="metric-lbl">Labor</div><div class="metric-val" id="m-labor">$0</div></div>
+        <div class="metric-box"><div class="metric-lbl">Total + Tax</div><div class="metric-val green" id="m-total">$0</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Pricing tier</div>
+        <div class="panel-body">
+          <div class="margin-row">
+            <label>Customer type — affects parts markup</label>
+            <select id="margin-select" onchange="renderQuote(); saveDraft()">
+              <option value="standard">Standard (35%)</option>
+              <option value="preferred">Preferred customer (25%)</option>
+              <option value="commercial">Commercial contract (20%)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Line items</div>
+        <div class="panel-body" id="qlines"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">Totals</div>
+        <div class="panel-body" id="qtotals"></div>
+      </div>
+      <div class="action-row">
+        <button class="btn" onclick="goStep(3)">← Edit</button>
+        <button class="btn btn-primary" onclick="showQuoteModal()">View printable quote</button>
+        <button class="btn btn-dark" onclick="finalizeQuote()" id="finalize-btn">Save &amp; finalize</button>
+      </div>
+    </div>
+
+  </div><!-- /view-estimate -->
+
+  <!-- HISTORY VIEW -->
+  <div id="view-history" style="display:none">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+      <div style="font-size:13px; color:var(--gray-500)">Quotes saved on this device</div>
+      <button class="clear-btn" onclick="clearHistory()">Clear all</button>
+    </div>
+    <div id="history-list"></div>
+  </div>
+
+</div><!-- /app-body -->
+
+<!-- QUOTE MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2>📋 Printable Estimate</h2>
+    <div class="quote-text" id="quote-text-content"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="copyFromModal()" id="modal-copy-btn">Copy to clipboard</button>
+      <button class="btn" onclick="printQuote()">Print / Save PDF</button>
+      <button class="btn" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+//  DATA — loaded via fetch() from data/clean/ (generated by normalize_data.py)
+//
+//  Why fetch() instead of embedding:
+//  Updating prices means running normalize_data.py and refreshing — no HTML
+//  edits required. The pipeline and the app are properly decoupled.
+//
+//  Fallback: if the fetch fails (e.g., opened as a local file without a server),
+//  we show a helpful error rather than a blank screen.
+// ─────────────────────────────────────────────────────────────────────────────
+
+let CUSTOMERS = [];
+let EQUIPMENT = [];
+let LABOR = [];
+let META = null;
+
+const MARGIN_OVERRIDES = {
+  standard:   1.0,   // use _retailPrice as-is (already has standard markup)
+  preferred:  0.90,  // 10% discount off retail = effectively ~25% on cost
+  commercial: 0.87,  // ~13% off retail = ~20% on cost
+};
+
+const TAX_RATE = 0.0875;
+const DRAFT_KEY = 'hvac_estimator_draft';
+const HISTORY_KEY = 'hvac_estimator_history';
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────────────────────────────────────
+const state = {
+  cust: null,
+  eCart: {},         // { equipId: qty }
+  lCart: {},         // { laborId: hours }
+  activeCat: 'all',
+  notes: '',
+  marginTier: 'standard',
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  UTILS
+// ─────────────────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const fmt = n => '$' + Math.round(n).toLocaleString();
+const fmtDate = d => d
+  ? new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  : '—';
+const fmtDateTime = iso => new Date(iso).toLocaleString('en-US', {
+  month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+});
+
+function highlight(text, query) {
+  if (!query || !text) return text || '';
+  const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return String(text).replace(re, '<mark>$1</mark>');
+}
+
+function retailPrice(equip) {
+  // _retailPrice is computed by the pipeline with per-category markup.
+  // We then apply the selected margin tier multiplier on top.
+  const base = equip._retailPrice || equip.baseCost || 0;
+  const multiplier = MARGIN_OVERRIDES[state.marginTier] || 1.0;
+  return Math.round(base * multiplier);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DATA LOADING
+// ─────────────────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const [customers, equipment, labor, meta] = await Promise.all([
+      fetch('data/clean/customers.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
+      fetch('data/clean/equipment.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
+      fetch('data/clean/labor_rates.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
+      fetch('data/clean/meta.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }),
+    ]);
+
+    CUSTOMERS = customers;
+    EQUIPMENT = equipment;
+    LABOR = labor.map(l => ({
+      id: `${l.jobType}/${l.level}`,
+      job: l.jobType.charAt(0).toUpperCase() + l.jobType.slice(1),
+      level: l.level.charAt(0).toUpperCase() + l.level.slice(1),
+      rate: l.hourlyRate,
+      min: l.estimatedHours?.min,
+      max: l.estimatedHours?.max,
+      midpoint: l._midpointHours,
+    }));
+    META = meta;
+
+    showFreshnessBadge(meta);
+    onDataLoaded();
+
+  } catch (err) {
+    $('view-loading').innerHTML = `
+      <div class="load-error">
+        <strong>Could not load catalog data</strong>
+        Run <code>python normalize_data.py</code> first to generate
+        <code>data/clean/</code>, then serve this file over HTTP
+        (e.g. <code>python -m http.server 8000</code>).
+        <br><br>Error: ${err.message}
+      </div>`;
+  }
+}
+
+function showFreshnessBadge(meta) {
+  if (!meta?.normalizedAt) return;
+  const updated = new Date(meta.normalizedAt);
+  const ageHours = (Date.now() - updated) / 36e5;
+  const badge = $('freshness-badge');
+  badge.style.display = 'block';
+  if (ageHours > 168) { // > 1 week
+    badge.textContent = `catalog: ${Math.floor(ageHours / 24)}d old`;
+    badge.classList.add('stale');
+    badge.title = 'Catalog may be outdated. Re-run normalize_data.py to refresh.';
+  } else {
+    badge.textContent = `catalog: ${fmtDate(meta.normalizedAt.split('T')[0])}`;
+  }
+}
+
+function onDataLoaded() {
+  $('view-loading').style.display = 'none';
+  buildCatTabs();
+  checkForDraft();
+  showView('estimate');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  VIEW SWITCHING
+// ─────────────────────────────────────────────────────────────────────────────
+function showView(v) {
+  ['estimate', 'history', 'loading'].forEach(name => {
+    $(`view-${name}`).style.display = name === v ? 'block' : 'none';
+  });
+  $('tab-estimate').classList.toggle('active', v === 'estimate');
+  $('tab-history').classList.toggle('active', v === 'history');
+  if (v === 'history') renderHistory();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DRAFT PERSISTENCE (localStorage)
+//
+//  Why localStorage over a backend:
+//  For this stage, we want zero infrastructure. localStorage gives us
+//  crash recovery (tab close, accidental refresh) for free. The tradeoff
+//  is that drafts don't sync across devices — acceptable for a single-tech
+//  workflow where each person owns their own phone.
+// ─────────────────────────────────────────────────────────────────────────────
+function saveDraft() {
+  if (!state.cust) return; // nothing worth saving yet
+  const draft = {
+    custId: state.cust.id,
+    eCart: state.eCart,
+    lCart: state.lCart,
+    notes: $('tech-notes')?.value || '',
+    marginTier: state.marginTier,
+    savedAt: new Date().toISOString(),
+  };
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    flashSaved();
+  } catch (e) { /* storage full or private mode */ }
+}
+
+function flashSaved() {
+  const dot = $('saved-dot');
+  dot.classList.add('show');
+  setTimeout(() => dot.classList.remove('show'), 1500);
+}
+
+function checkForDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const draft = JSON.parse(raw);
+    const cust = CUSTOMERS.find(c => c.id === draft.custId);
+    if (!cust) return;
+    const banner = $('draft-banner');
+    $('draft-banner-text').textContent =
+      `Unsaved draft for ${cust.name} from ${fmtDateTime(draft.savedAt)}. Restore?`;
+    banner.style.display = 'flex';
+  } catch (e) {}
+}
+
+function restoreDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY));
+    const cust = CUSTOMERS.find(c => c.id === draft.custId);
+    if (!cust) return;
+    selectCustomer(cust.id);
+    state.eCart = draft.eCart || {};
+    state.lCart = draft.lCart || {};
+    state.marginTier = draft.marginTier || 'standard';
+    if ($('margin-select')) $('margin-select').value = state.marginTier;
+    $('draft-banner').style.display = 'none';
+    goStep(4);
+  } catch (e) {}
+}
+
+function dismissDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+  $('draft-banner').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  QUOTE HISTORY (localStorage)
+// ─────────────────────────────────────────────────────────────────────────────
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; }
+  catch (e) { return []; }
+}
+
+function saveToHistory(entry) {
+  const history = getHistory();
+  history.unshift(entry); // newest first
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 100))); }
+  catch (e) {}
+}
+
+function renderHistory() {
+  const history = getHistory();
+  const el = $('history-list');
+  if (!history.length) {
+    el.innerHTML = `<div class="history-empty">📋<p>No quotes saved yet.<br>Finalize a quote to see it here.</p></div>`;
+    return;
+  }
+  el.innerHTML = history.map((q, i) => `
+    <div class="h-card">
+      <div class="h-card-top">
+        <div>
+          <div class="h-customer">${q.customerName}</div>
+          <div class="h-items">${q.itemSummary}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="h-total">${fmt(q.total)}</div>
+          <div class="h-time">${fmtDateTime(q.savedAt)}</div>
+        </div>
+      </div>
+      <div class="h-actions">
+        <button class="h-btn" onclick="showHistoryQuote(${i})">View quote</button>
+        <button class="h-btn danger" onclick="deleteHistoryEntry(${i})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function showHistoryQuote(i) {
+  const entry = getHistory()[i];
+  if (!entry) return;
+  $('quote-text-content').textContent = entry.quoteText;
+  $('modal').classList.add('open');
+}
+
+function deleteHistoryEntry(i) {
+  const history = getHistory();
+  history.splice(i, 1);
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch (e) {}
+  renderHistory();
+}
+
+function clearHistory() {
+  if (!confirm('Clear all saved quotes?')) return;
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistory();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  STEP NAVIGATION
+// ─────────────────────────────────────────────────────────────────────────────
+function goStep(n) {
+  [1, 2, 3, 4].forEach(i => {
+    $('step' + i).style.display = i === n ? 'block' : 'none';
+    const btn = $('sn' + i);
+    btn.className = 'step-btn' + (i === n ? ' active' : i < n ? ' done' : '');
+  });
+  if (n === 2) renderEquip();
+  if (n === 3) renderLabor();
+  if (n === 4) { renderQuote(); if ($('margin-select')) $('margin-select').value = state.marginTier; }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  STEP 1 – CUSTOMERS
+// ─────────────────────────────────────────────────────────────────────────────
+function renderCustomers() {
+  const q = ($('csearch').value || '').toLowerCase().trim();
+  const list = CUSTOMERS.filter(c =>
+    !q ||
+    c.name.toLowerCase().includes(q) ||
+    c.address.toLowerCase().includes(q) ||
+    (c.phone || '').replace(/\D/g, '').includes(q.replace(/\D/g, ''))
+  );
+
+  $('clist').innerHTML = list.length
+    ? list.map(c => {
+        const isSel = state.cust?.id === c.id;
+        return `<div class="c-card${isSel ? ' selected' : ''}" onclick="selectCustomer('${c.id}')">
+          <div class="c-name">
+            ${highlight(c.name, q)}
+            ${c.propertyType === 'commercial' ? '<span class="badge badge-comm">commercial</span>' : ''}
+            ${(c.systemAge || 0) >= 15 ? `<span class="badge badge-old">system: ${c.systemAge}yr</span>` : ''}
+          </div>
+          <div class="c-detail">${highlight(c.address, q)}</div>
+          <div class="c-detail">${highlight(c.phone || 'no phone on file', q)} · ${c.systemType || '—'}</div>
+        </div>`;
+      }).join('')
+    : '<div class="empty-state">No customers found</div>';
+}
+
+function selectCustomer(id) {
+  state.cust = CUSTOMERS.find(c => c.id === id);
+  renderCustomers();
+  $('cdetail-panel').style.display = 'block';
+
+  const c = state.cust;
+  const sqft = (c.squareFootage || c.sqft || 0).toLocaleString();
+  const warnHtml = (c.systemAge || 0) >= 15
+    ? `<div class="warn-box">⚠️ System is ${c.systemAge} years old — consider discussing replacement options on this visit.</div>`
+    : '';
+
+  $('cdetail').innerHTML = `
+    <div class="prop-grid">
+      <div class="prop-box"><div class="prop-label">System</div><div class="prop-val">${c.systemType || '—'}</div></div>
+      <div class="prop-box"><div class="prop-label">Property</div><div class="prop-val" style="text-transform:capitalize">${c.propertyType || '—'} · ${sqft} sq ft</div></div>
+      <div class="prop-box"><div class="prop-label">System age</div><div class="prop-val">${c.systemAge != null ? c.systemAge + ' years' : 'Unknown'}</div></div>
+      <div class="prop-box"><div class="prop-label">Last service</div><div class="prop-val">${fmtDate(c.lastServiceDate)}</div></div>
+    </div>${warnHtml}`;
+
+  $('btn-next1').disabled = false;
+  saveDraft();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  STEP 2 – EQUIPMENT
+// ─────────────────────────────────────────────────────────────────────────────
+function buildCatTabs() {
+  const cats = ['all', ...new Set(EQUIPMENT.map(e => e.category))].sort(
+    (a, b) => a === 'all' ? -1 : b === 'all' ? 1 : a.localeCompare(b)
+  );
+  $('cat-tabs').innerHTML = cats.map(c =>
+    `<button class="cat-pill${c === 'all' ? ' active' : ''}" onclick="setCat('${c}', this)">${c === 'all' ? 'All items' : c}</button>`
+  ).join('');
+}
+
+function setCat(c, el) {
+  state.activeCat = c;
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderEquip();
+}
+
+function renderEquip() {
+  const q = ($('esearch')?.value || '').toLowerCase().trim();
+  const list = EQUIPMENT.filter(e =>
+    (state.activeCat === 'all' || e.category === state.activeCat) &&
+    (!q || e.name.toLowerCase().includes(q) || e.brand.toLowerCase().includes(q) || (e.modelNumber || '').toLowerCase().includes(q))
+  );
+
+  $('elist').innerHTML = list.length
+    ? list.map(e => {
+        const qty = state.eCart[e.id] || 0;
+        const price = retailPrice(e);
+        return `<div class="e-row">
+          <div class="e-info">
+            <div class="e-name">${highlight(e.name, q)}</div>
+            <div class="e-meta">${highlight(e.brand, q)} · ${highlight(e.modelNumber || '—', q)}</div>
+          </div>
+          <div class="e-price">${fmt(price)}</div>
+          ${qty
+            ? `<div class="qty-wrap">
+                <button class="qty-btn" onclick="chgE('${e.id}',-1)">−</button>
+                <span class="qty-num">${qty}</span>
+                <button class="qty-btn" onclick="chgE('${e.id}',1)">+</button>
+               </div>`
+            : `<button class="add-btn" onclick="chgE('${e.id}',1)" title="Add">+</button>`}
+        </div>`;
+      }).join('')
+    : '<div class="empty-state">No items match</div>';
+}
+
+function chgE(id, delta) {
+  const n = Math.max(0, (state.eCart[id] || 0) + delta);
+  if (!n) delete state.eCart[id]; else state.eCart[id] = n;
+  renderEquip();
+  saveDraft();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  STEP 3 – LABOR
+// ─────────────────────────────────────────────────────────────────────────────
+function renderLabor() {
+  $('llist').innerHTML = LABOR.map(l => {
+    const hrs = state.lCart[l.id] || '';
+    const total = (parseFloat(hrs) || 0) * l.rate;
+    return `<div class="l-row">
+      <div class="l-info">
+        <div class="l-name">${l.job} — ${l.level}</div>
+        <div class="l-rate">${fmt(l.rate)} / hr</div>
+        ${l.min != null ? `<div class="l-range">typical: ${l.min}–${l.max} hrs</div>` : ''}
+        <div class="l-hrs-wrap">
+          <span class="l-hrs-label">Hours:</span>
+          <input type="number" class="hrs-input" value="${hrs}" placeholder="0" min="0" step="0.5"
+            oninput="setHrs('${l.id}', this.value, this)">
+        </div>
+      </div>
+      <div class="l-total" id="lt-${l.id.replace('/', '-')}">${total > 0 ? fmt(total) : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+function setHrs(id, v, input) {
+  const n = parseFloat(v) || 0;
+  if (!n) delete state.lCart[id]; else state.lCart[id] = n;
+  const l = LABOR.find(x => x.id === id);
+  const totalEl = $('lt-' + id.replace('/', '-'));
+  if (totalEl) totalEl.textContent = (n && l) ? fmt(n * l.rate) : '';
+  saveDraft();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  STEP 4 – QUOTE
+// ─────────────────────────────────────────────────────────────────────────────
+function calcTotals() {
+  let parts = 0, labor = 0;
+  Object.entries(state.eCart).forEach(([id, qty]) => {
+    const e = EQUIPMENT.find(x => x.id === id);
+    if (e) parts += retailPrice(e) * qty;
+  });
+  Object.entries(state.lCart).forEach(([id, hrs]) => {
+    const l = LABOR.find(x => x.id === id);
+    if (l) labor += l.rate * hrs;
+  });
+  return { parts, labor, sub: parts + labor };
+}
+
+function renderQuote() {
+  state.marginTier = $('margin-select')?.value || 'standard';
+  const { parts, labor, sub } = calcTotals();
+  const tax = sub * TAX_RATE;
+  const total = sub + tax;
+
+  $('m-parts').textContent = fmt(parts);
+  $('m-labor').textContent = fmt(labor);
+  $('m-total').textContent = fmt(total);
+
+  const lines = [];
+  Object.entries(state.eCart).forEach(([id, qty]) => {
+    const e = EQUIPMENT.find(x => x.id === id);
+    if (e) lines.push({ name: e.name, sub: `${e.brand} · ${e.modelNumber} × ${qty}`, amt: retailPrice(e) * qty, type: 'e', id });
+  });
+  Object.entries(state.lCart).forEach(([id, hrs]) => {
+    const l = LABOR.find(x => x.id === id);
+    if (l) lines.push({ name: `${l.job} — ${l.level}`, sub: `${hrs} hr${hrs !== 1 ? 's' : ''} @ ${fmt(l.rate)}/hr`, amt: l.rate * hrs, type: 'l', id });
+  });
+
+  $('qlines').innerHTML = lines.length
+    ? lines.map(ln => `<div class="q-line">
+        <div style="flex:1;min-width:0">
+          <div class="q-name">${ln.name}</div>
+          <div class="q-sub">${ln.sub}</div>
+        </div>
+        <div class="q-amt">${fmt(ln.amt)}</div>
+        <button class="rm-btn" onclick="rmLine('${ln.type}','${ln.id}')">×</button>
+      </div>`).join('')
+    : '<div class="empty-state">No items — go back to add equipment or labor</div>';
+
+  const tierLabels = { standard: 'Standard (35%)', preferred: 'Preferred (25%)', commercial: 'Commercial (20%)' };
+
+  $('qtotals').innerHTML = `
+    <div class="totals-row"><span>Parts markup tier</span><span style="font-size:12px;color:var(--gray-500)">${tierLabels[state.marginTier]}</span></div>
+    <div class="totals-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+    <div class="totals-row"><span>Tax (8.75% IL)</span><span>${fmt(tax)}</span></div>
+    <div class="totals-row grand"><span>Total</span><span>${fmt(total)}</span></div>`;
+}
+
+function rmLine(type, id) {
+  if (type === 'e') delete state.eCart[id]; else delete state.lCart[id];
+  renderQuote();
+  saveDraft();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  QUOTE TEXT OUTPUT
+// ─────────────────────────────────────────────────────────────────────────────
+function buildQuoteText() {
+  const { parts, labor, sub } = calcTotals();
+  const tax = sub * TAX_RATE;
+  const c = state.cust;
+  const tierLabels = { standard: 'Standard', preferred: 'Preferred customer', commercial: 'Commercial contract' };
+
+  let txt = `═══════════════════════════════════════\n`;
+  txt += `  SERVICE ESTIMATE\n`;
+  txt += `═══════════════════════════════════════\n`;
+  txt += `Date:     ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}\n`;
+  txt += `Customer: ${c.name}\n`;
+  txt += `Address:  ${c.address}\n`;
+  if (c.phone) txt += `Phone:    ${c.phone}\n`;
+  txt += `Pricing:  ${tierLabels[state.marginTier]}\n\n`;
+
+  const equipLines = Object.entries(state.eCart).map(([id, qty]) => {
+    const e = EQUIPMENT.find(x => x.id === id);
+    return e ? { name: e.name, detail: `${e.brand} #${e.modelNumber}`, qty, total: retailPrice(e) * qty } : null;
+  }).filter(Boolean);
+
+  const laborLines = Object.entries(state.lCart).map(([id, hrs]) => {
+    const l = LABOR.find(x => x.id === id);
+    return l ? { name: `${l.job} — ${l.level}`, detail: `${hrs} hr @ $${l.rate}/hr`, total: l.rate * hrs } : null;
+  }).filter(Boolean);
+
+  if (equipLines.length) {
+    txt += `EQUIPMENT & PARTS\n`;
+    txt += `───────────────────────────────────────\n`;
+    equipLines.forEach(e => {
+      txt += `${e.name}\n  ${e.detail}${e.qty > 1 ? ` × ${e.qty}` : ''}  .....  ${fmt(e.total)}\n`;
+    });
+    txt += `\n`;
+  }
+
+  if (laborLines.length) {
+    txt += `LABOR\n`;
+    txt += `───────────────────────────────────────\n`;
+    laborLines.forEach(l => {
+      txt += `${l.name}\n  ${l.detail}  .....  ${fmt(l.total)}\n`;
+    });
+    txt += `\n`;
+  }
+
+  const notes = $('tech-notes')?.value.trim();
+  if (notes) { txt += `NOTES\n───────────────────────────────────────\n${notes}\n\n`; }
+
+  txt += `═══════════════════════════════════════\n`;
+  txt += `  Subtotal    ${fmt(sub).padStart(8)}\n`;
+  txt += `  Tax (8.75%) ${fmt(tax).padStart(8)}\n`;
+  txt += `  ─────────────────────────\n`;
+  txt += `  TOTAL       ${fmt(sub + tax).padStart(8)}\n`;
+  txt += `═══════════════════════════════════════\n`;
+  txt += `\nThank you for choosing us for your HVAC needs.\n`;
+  return txt;
+}
+
+function showQuoteModal() {
+  $('quote-text-content').textContent = buildQuoteText();
+  $('modal').classList.add('open');
+}
+
+function closeModal() { $('modal').classList.remove('open'); }
+
+function copyFromModal() {
+  navigator.clipboard.writeText(buildQuoteText()).catch(() => {});
+  const btn = $('modal-copy-btn');
+  btn.textContent = '✓ Copied!';
+  setTimeout(() => btn.textContent = 'Copy to clipboard', 2000);
+}
+
+function printQuote() {
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Estimate — ${state.cust.name}</title>
+    <style>body{font-family:'Courier New',monospace;font-size:13px;padding:40px;white-space:pre-wrap;color:#111}</style>
+    </head><body>${buildQuoteText().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);
+  w.document.close();
+  w.print();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  FINALIZE — saves to history and clears draft
+// ─────────────────────────────────────────────────────────────────────────────
+function finalizeQuote() {
+  const { sub } = calcTotals();
+  const tax = sub * TAX_RATE;
+
+  const itemParts = Object.entries(state.eCart).map(([id, qty]) => {
+    const e = EQUIPMENT.find(x => x.id === id);
+    return e ? `${e.name}${qty > 1 ? ' ×' + qty : ''}` : null;
+  }).filter(Boolean);
+  const itemLabor = Object.entries(state.lCart).map(([id, hrs]) => {
+    const l = LABOR.find(x => x.id === id);
+    return l ? `${l.job} (${hrs}hr)` : null;
+  }).filter(Boolean);
+  const allItems = [...itemParts, ...itemLabor];
+
+  const entry = {
+    customerName: state.cust.name,
+    customerAddress: state.cust.address,
+    total: sub + tax,
+    itemSummary: allItems.slice(0, 3).join(', ') + (allItems.length > 3 ? ' +' + (allItems.length - 3) + ' more' : ''),
+    marginTier: state.marginTier,
+    quoteText: buildQuoteText(),
+    savedAt: new Date().toISOString(),
+  };
+
+  saveToHistory(entry);
+  localStorage.removeItem(DRAFT_KEY);
+
+  // Flash the history tab
+  const dot = $('saved-dot');
+  dot.classList.add('show');
+
+  const btn = $('finalize-btn');
+  btn.textContent = '✓ Saved to history';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = 'Save & finalize';
+    btn.disabled = false;
+    dot.classList.remove('show');
+  }, 2500);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  BOOT
+// ─────────────────────────────────────────────────────────────────────────────
+$('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
+loadData();
+</script>
+</body>
+</html>
