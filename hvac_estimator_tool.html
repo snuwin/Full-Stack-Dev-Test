@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HVAC Field Estimator</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❄️</text></svg>">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80'>%E2%9D%84</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -469,7 +468,7 @@
     <div class="app-logo">❄</div>
     <div>
       <div class="app-title">HVAC Field Estimator</div>
-      <div class="app-sub">Springfield &amp; Central IL</div>
+      <div class="app-sub">Irvine, CA</div>
     </div>
   </div>
   <div class="header-right">
@@ -572,7 +571,7 @@
         <div class="panel-head">Pricing tier</div>
         <div class="panel-body">
           <div class="margin-row">
-            <label>Customer type — affects parts markup</label>
+            <label for="margin-select">Customer type — affects parts markup</label>
             <select id="margin-select" onchange="renderQuote(); saveDraft()">
               <option value="standard">Standard (35%)</option>
               <option value="preferred">Preferred customer (25%)</option>
@@ -706,8 +705,8 @@ async function loadData() {
       job: l.jobType.charAt(0).toUpperCase() + l.jobType.slice(1),
       level: l.level.charAt(0).toUpperCase() + l.level.slice(1),
       rate: l.hourlyRate,
-      min: l.estimatedHours?.min,
-      max: l.estimatedHours?.max,
+      min: l.estimatedHours ? l.estimatedHours.min : undefined,
+      max: l.estimatedHours ? l.estimatedHours.max : undefined,
       midpoint: l._midpointHours,
     }));
     META = meta;
@@ -728,7 +727,7 @@ async function loadData() {
 }
 
 function showFreshnessBadge(meta) {
-  if (!meta?.normalizedAt) return;
+  if (!meta || !meta.normalizedAt) return;
   const updated = new Date(meta.normalizedAt);
   const ageHours = (Date.now() - updated) / 36e5;
   const badge = $('freshness-badge');
@@ -776,7 +775,7 @@ function saveDraft() {
     custId: state.cust.id,
     eCart: state.eCart,
     lCart: state.lCart,
-    notes: $('tech-notes')?.value || '',
+    notes: $('tech-notes') ? $('tech-notes').value : '',
     marginTier: state.marginTier,
     savedAt: new Date().toISOString(),
   };
@@ -916,7 +915,7 @@ function renderCustomers() {
 
   $('clist').innerHTML = list.length
     ? list.map(c => {
-        const isSel = state.cust?.id === c.id;
+        const isSel = state.cust && state.cust.id === c.id;
         return `<div class="c-card${isSel ? ' selected' : ''}" onclick="selectCustomer('${c.id}')">
           <div class="c-name">
             ${highlight(c.name, q)}
@@ -973,7 +972,8 @@ function setCat(c, el) {
 }
 
 function renderEquip() {
-  const q = ($('esearch')?.value || '').toLowerCase().trim();
+  const esearchEl = $('esearch');
+  const q = ((esearchEl && esearchEl.value) || '').toLowerCase().trim();
   const list = EQUIPMENT.filter(e =>
     (state.activeCat === 'all' || e.category === state.activeCat) &&
     (!q || e.name.toLowerCase().includes(q) || e.brand.toLowerCase().includes(q) || (e.modelNumber || '').toLowerCase().includes(q))
@@ -1057,7 +1057,8 @@ function calcTotals() {
 }
 
 function renderQuote() {
-  state.marginTier = $('margin-select')?.value || 'standard';
+  const marginEl = $('margin-select');
+  state.marginTier = (marginEl && marginEl.value) || 'standard';
   const { parts, labor, sub } = calcTotals();
   const tax = sub * TAX_RATE;
   const total = sub + tax;
@@ -1148,7 +1149,8 @@ function buildQuoteText() {
     txt += `\n`;
   }
 
-  const notes = $('tech-notes')?.value.trim();
+  const notesEl = $('tech-notes');
+  const notes = notesEl && notesEl.value ? notesEl.value.trim() : '';
   if (notes) { txt += `NOTES\n───────────────────────────────────────\n${notes}\n\n`; }
 
   txt += `═══════════════════════════════════════\n`;
@@ -1171,17 +1173,31 @@ function closeModal() { $('modal').classList.remove('open'); }
 function copyFromModal() {
   navigator.clipboard.writeText(buildQuoteText()).catch(() => {});
   const btn = $('modal-copy-btn');
-  btn.textContent = '✓ Copied!';
+  btn.textContent = 'Copied!';
   setTimeout(() => btn.textContent = 'Copy to clipboard', 2000);
 }
 
 function printQuote() {
-  const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html><head><title>Estimate — ${state.cust.name}</title>
-    <style>body{font-family:'Courier New',monospace;font-size:13px;padding:40px;white-space:pre-wrap;color:#111}</style>
-    </head><body>${buildQuoteText().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);
-  w.document.close();
-  w.print();
+  const titleName = state.cust ? state.cust.name : 'Estimate';
+  const styles = "body{font-family:'Courier New',monospace;font-size:13px;padding:40px;white-space:pre-wrap;color:#111}";
+  const body = buildQuoteText()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const html =
+    '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Estimate - ' +
+    titleName +
+    '</title><style>' +
+    styles +
+    '</style></head><body>' +
+    body +
+    '</' + 'body></' + 'html>';
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1205,7 +1221,7 @@ function finalizeQuote() {
     customerName: state.cust.name,
     customerAddress: state.cust.address,
     total: sub + tax,
-    itemSummary: allItems.slice(0, 3).join(', ') + (allItems.length > 3 ? ' +' + (allItems.length - 3) + ' more' : ''),
+    itemSummary: allItems.slice(0, 3).join(', ') + (allItems.length > 3 ? ` +${allItems.length - 3} more` : ''),
     marginTier: state.marginTier,
     quoteText: buildQuoteText(),
     savedAt: new Date().toISOString(),
