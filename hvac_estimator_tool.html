@@ -1189,6 +1189,11 @@ function buildQuoteText() {
 }
 
 function showQuoteModal() {
+  if (!state.cust) {
+    alert('Please select a customer before viewing the quote.');
+    goStep(1);
+    return;
+  }
   $('quote-text-content').textContent = buildQuoteText();
   $('modal').classList.add('open');
 }
@@ -1229,6 +1234,12 @@ function printQuote() {
 //  FINALIZE — saves to history and clears draft
 // ─────────────────────────────────────────────────────────────────────────────
 function finalizeQuote() {
+  if (!state.cust) {
+    alert('Please select a customer before finalizing.');
+    goStep(1);
+    return;
+  }
+  
   const { sub } = calcTotals();
   const tax = sub * TAX_RATE;
 
