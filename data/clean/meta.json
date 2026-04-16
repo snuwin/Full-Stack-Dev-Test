@@ -1,11 +1,11 @@
 {
-  "normalizedAt": "2026-04-14T18:30:19Z",
+  "normalizedAt": "2026-04-16T21:20:00Z",
   "counts": {
     "customers": 10,
     "equipment": 30,
     "laborRates": 11
   },
-  "taxRate": 0.0875,
+  "taxRate": 0.0975,
   "markupConfig": {
     "Air Conditioner": 0.3,
     "Heat Pump": 0.3,
