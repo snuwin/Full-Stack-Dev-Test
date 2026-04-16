@@ -58,7 +58,7 @@ MARKUP_BY_CATEGORY = {
 REPLACEMENT_AGE_THRESHOLD = 15
 
 # Illinois sales tax rate
-ILLINOIS_TAX_RATE = 0.0875
+ILLINOIS_TAX_RATE = 0.0975
 
 
 # ── Issue tracking ─────────────────────────────────────────────────────────────

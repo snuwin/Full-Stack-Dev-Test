@@ -653,9 +653,9 @@
           <div class="margin-row">
             <label for="margin-select">Customer type — affects parts markup</label>
             <select id="margin-select" onchange="renderQuote(); saveDraft()">
-              <option value="standard">Standard (35%)</option>
-              <option value="preferred">Preferred customer (25%)</option>
-              <option value="commercial">Commercial contract (20%)</option>
+              <option value="standard">Standard</option>
+              <option value="preferred">Preferred customer (10% off retail)</option>
+              <option value="commercial">Commercial contract (13% off retail)</option>
             </select>
           </div>
         </div>
@@ -747,9 +747,9 @@ let LABOR = [];
 let META = null;
 
 const MARGIN_OVERRIDES = {
-  standard:   1.0,   // use _retailPrice as-is (already has standard markup)
-  preferred:  0.90,  // 10% discount off retail = effectively ~25% on cost
-  commercial: 0.87,  // ~13% off retail = ~20% on cost
+  standard:   1.0,   
+  preferred:  0.90,  
+  commercial: 0.87,  
 };
 
 const TAX_RATE = 0.0875;
@@ -1252,12 +1252,12 @@ function renderQuote() {
       </div>`).join('')
     : '<div class="empty-state">No items — go back to add equipment or labor</div>';
 
-  const tierLabels = { standard: 'Standard (35%)', preferred: 'Preferred (25%)', commercial: 'Commercial (20%)' };
+  const tierLabels = { standard: 'Standard', preferred: 'Preferred (10%)', commercial: 'Commercial (13%)' };
 
   $('qtotals').innerHTML = `
     <div class="totals-row"><span>Parts markup tier</span><span style="font-size:12px;color:var(--gray-500)">${tierLabels[state.marginTier]}</span></div>
     <div class="totals-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
-    <div class="totals-row"><span>Tax (8.75% IL)</span><span>${fmt(tax)}</span></div>
+    <div class="totals-row"><span>Tax (9.75% IL)</span><span>${fmt(tax)}</span></div>
     <div class="totals-row grand"><span>Total</span><span>${fmt(total)}</span></div>`;
 }
 
@@ -1319,7 +1319,7 @@ function buildQuoteText() {
 
   txt += `═══════════════════════════════════════\n`;
   txt += `  Subtotal    ${fmt(sub).padStart(8)}\n`;
-  txt += `  Tax (8.75%) ${fmt(tax).padStart(8)}\n`;
+  txt += `  Tax (9.75%) ${fmt(tax).padStart(8)}\n`;
   txt += `  ─────────────────────────\n`;
   txt += `  TOTAL       ${fmt(sub + tax).padStart(8)}\n`;
   txt += `═══════════════════════════════════════\n`;
