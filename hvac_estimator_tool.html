@@ -152,7 +152,6 @@
     .l-row { flex-wrap: wrap; gap: 8px; }
     .l-hrs-wrap { flex-wrap: nowrap; align-items: center; gap: 8px; }
     .hrs-input { width: 60px !important; }
-    .l-total { width: 100%; text-align: left; padding-top: 0; }
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -402,7 +401,19 @@
     padding: 0 10px; 
     text-align: center; 
     font-family: var(--mono); 
-    font-size: 16px; 
+    font-size: 16px;
+    cursor: default;
+    pointer-events: none;
+    background: var(--gray-100);
+    border-color: var(--gray-200);
+  }
+  .hrs-input::-webkit-outer-spin-button,
+  .hrs-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .hrs-input[type=number] {
+    -moz-appearance: textfield;
   }
   .l-total { font-size: 14px; font-weight: 600; color: var(--gray-700); min-width: 72px; text-align: right; padding-top: 3px; flex-shrink: 0; }
 
@@ -1134,8 +1145,9 @@ function renderLabor() {
         ${l.min != null ? `<div class="l-range">typical: ${l.min}–${l.max} hrs</div>` : ''}
         <div class="l-hrs-wrap">
           <span class="l-hrs-label">Hours:</span>
-          <input type="number" class="hrs-input" value="${hrs}" placeholder="0" min="0" step="0.5"
-            oninput="setHrs('${l.id}', this.value, this)">
+          <button class="qty-btn" onclick="setHrs('${l.id}', Math.max(0, (parseFloat(state.lCart['${l.id}'] || 0) - 0.5)), null)">−</button>
+          <input type="number" class="hrs-input" value="${hrs}" min="0" ${l.max != null ? `max="${l.max}"` : ''} step="0.5" readonly>
+          <button class="qty-btn" onclick="setHrs('${l.id}', Math.min(${l.max ?? 99}, (parseFloat(state.lCart['${l.id}'] || 0) + 0.5)), null)">+</button>
         </div>
       </div>
       <div class="l-total" id="lt-${l.id.replace('/', '-')}">${total > 0 ? fmt(total) : ''}</div>
@@ -1143,13 +1155,19 @@ function renderLabor() {
   }).join('');
 }
 
-function setHrs(id, v, input) {
-  const n = parseFloat(v) || 0;
-  if (!n) delete state.lCart[id]; else state.lCart[id] = n;
-  const l = LABOR.find(x => x.id === id);
-  const totalEl = $('lt-' + id.replace('/', '-'));
-  if (totalEl) totalEl.textContent = (n && l) ? fmt(n * l.rate) : '';
+function setHrs(id, val, el) {
+  const num = Math.round(parseFloat(val) * 2) / 2; // snap to 0.5
+  state.lCart[id] = num > 0 ? num : '';
   saveDraft();
+  // re-render so stepper buttons reflect new value
+  if (!el) renderLabor();
+  // update total display
+  const labor = LABOR.find(l => l.id === id);
+  if (labor) {
+    const total = (parseFloat(state.lCart[id]) || 0) * labor.rate;
+    const el2 = document.getElementById('lt-' + id.replace('/', '-'));
+    if (el2) el2.textContent = total > 0 ? fmt(total) : '';
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
