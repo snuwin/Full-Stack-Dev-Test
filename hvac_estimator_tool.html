@@ -282,12 +282,30 @@
   .draft-dismiss { background: transparent; color: #1e40af; border: 1px solid #93c5fd !important; }
 
   /* ── CATEGORY PILLS ── */
+  .cat-scroll-wrap {
+    position: relative;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
   .cat-scroll {
     display: flex; gap: 6px;
     overflow-x: auto; padding-bottom: 2px;
-    margin-bottom: 12px; scrollbar-width: none;
+    scrollbar-width: none;
+    flex: 1;
   }
-  .cat-scroll::-webkit-scrollbar { display: none; }
+  .cat-arrow {
+    width: 28px; height: 28px;
+    background: white; border: 1.5px solid var(--gray-200);
+    border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--gray-600);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: all 0.12s; flex-shrink: 0;
+  }
+  .cat-arrow:hover { border-color: var(--green-mid); color: var(--green); }
+  .cat-arrow.hidden { opacity: 0; pointer-events: none; }
   .cat-pill {
     padding: 5px 13px; border-radius: 20px;
     border: 1.5px solid var(--gray-200); background: var(--gray-50);
@@ -296,7 +314,6 @@
   }
   .cat-pill.active { background: var(--gray-900); border-color: var(--gray-900); color: white; }
   .cat-pill:not(.active):hover { border-color: var(--gray-400); color: var(--gray-800); }
-
   /* ── EQUIPMENT ROWS ── */
   .e-row {
     display: flex; align-items: center; gap: 10px;
@@ -533,7 +550,11 @@
       <div class="panel">
         <div class="panel-head">Equipment &amp; parts catalog</div>
         <div class="panel-body">
-          <div class="cat-scroll" id="cat-tabs"></div>
+          <div class="cat-scroll-wrap">
+            <button class="cat-arrow left hidden" id="cat-left" onclick="scrollCats(-1)">‹</button>
+            <div class="cat-scroll" id="cat-tabs"></div>
+            <button class="cat-arrow right" id="cat-right" onclick="scrollCats(1)">›</button>
+          </div>
           <input type="text" id="esearch" placeholder="Search by name, brand, or model number…" oninput="renderEquip()" style="margin-bottom:12px">
           <div id="elist"></div>
         </div>
@@ -988,6 +1009,20 @@ function selectCustomer(id) {
 // ─────────────────────────────────────────────────────────────────────────────
 //  STEP 2 – EQUIPMENT
 // ─────────────────────────────────────────────────────────────────────────────
+function scrollCats(dir) {
+  const el = $('cat-tabs');
+  el.scrollBy({ left: dir * 120, behavior: 'smooth' });
+  setTimeout(updateCatArrows, 150);
+}
+ 
+function updateCatArrows() {
+  const el = $('cat-tabs');
+  if (!el) return;
+  const atStart = el.scrollLeft <= 4;
+  const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+  $('cat-left').classList.toggle('hidden', atStart);
+  $('cat-right').classList.toggle('hidden', atEnd);
+}
 function buildCatTabs() {
   const cats = ['all', ...new Set(EQUIPMENT.map(e => e.category))].sort(
     (a, b) => a === 'all' ? -1 : b === 'all' ? 1 : a.localeCompare(b)
