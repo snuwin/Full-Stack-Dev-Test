@@ -899,9 +899,13 @@ function restoreDraft() {
   } catch (e) {}
 }
 
-function dismissDraft() {
+function clearDraft() {
   localStorage.removeItem(DRAFT_KEY);
   $('draft-banner').style.display = 'none';
+}
+
+function dismissDraft() {
+  clearDraft();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1369,20 +1373,27 @@ function finalizeQuote() {
   };
 
   saveToHistory(entry);
-  localStorage.removeItem(DRAFT_KEY);
+  clearDraft();
 
   // Flash the history tab
   const dot = $('saved-dot');
   dot.classList.add('show');
 
   const btn = $('finalize-btn');
-  btn.textContent = '✓ Saved to history';
+  btn.textContent = '✓ Saved!';
   btn.disabled = true;
+  
   setTimeout(() => {
-    btn.textContent = 'Save & finalize';
-    btn.disabled = false;
     dot.classList.remove('show');
-  }, 2500);
+    state.cust = null;
+    state.eCart = {};
+    state.lCart = {};
+    state.marginTier = 'standard';
+    $('tech-notes').value = '';
+    $('csearch').value = '';
+    showView('estimate');
+    goStep(1);
+  }, 1500);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
