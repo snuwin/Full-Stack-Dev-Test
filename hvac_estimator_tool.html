@@ -498,6 +498,8 @@
   .btn-primary:hover { background: var(--green-dark); border-color: var(--green-dark); }
   .btn-dark { background: var(--gray-900); border-color: var(--gray-900); color: white; }
   .btn-dark:hover { background: var(--gray-700); border-color: var(--gray-700); }
+  .btn-red { background: var(--red); border-color: var(--red); color: white; }
+  .btn-red:hover { background: #b91c1c; border-color: #b91c1c; }
 
   .empty-state { text-align: center; padding: 28px; color: var(--gray-400); font-size: 13px; }
 
@@ -670,6 +672,7 @@
         <button class="btn" onclick="goStep(3)">← Edit</button>
         <button class="btn btn-primary" onclick="showQuoteModal()">View printable quote</button>
         <button class="btn btn-dark" onclick="finalizeQuote()" id="finalize-btn">Save &amp; finalize</button>
+        <button class="btn btn-red" onclick="confirmClearQuote()" id="clear-btn">Clear Quote</button>
       </div>
     </div>
 
@@ -698,6 +701,19 @@
     </div>
   </div>
 </div>
+
+<!-- CLEAR QUOTE CONFIRM MODAL -->
+<div class="modal-bg" id="clear-modal">
+  <div class="modal" style="max-width: 360px; text-align: center;">
+    <h2>Clear this quote?</h2>
+    <p style="font-size: 14px; color: var(--gray-500); margin-bottom: 20px;">All customer info, equipment, and labor will be lost.</p>
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn btn-red" onclick="executeClearQuote()">Yes, clear it</button>
+      <button class="btn" onclick="$('clear-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1049,7 +1065,7 @@ function selectCustomer(id) {
   const c = state.cust;
   const sqft = (c.squareFootage || c.sqft || 0).toLocaleString();
   const warnHtml = (c.systemAge || 0) >= 15
-    ? `<div class="warn-box">⚠️ System is ${c.systemAge} years old — consider discussing replacement options on this visit.</div>`
+    ? `<div class="warn-box">⚠️ System is ${c.systemAge} years old — worth discussing system health on this visit.</div>`
     : '';
 
   $('cdetail').innerHTML = `
@@ -1396,10 +1412,30 @@ function finalizeQuote() {
   }, 1500);
 }
 
+function confirmClearQuote() {
+  $('clear-modal').classList.add('open');
+}
+
+function executeClearQuote() {
+  $('clear-modal').classList.remove('open');
+  state.cust = null;
+  state.eCart = {};
+  state.lCart = {};
+  state.marginTier = 'standard';
+  $('tech-notes').value = '';
+  $('csearch').value = '';
+  clearDraft();
+  goStep(1);
+}
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  BOOT
 // ─────────────────────────────────────────────────────────────────────────────
 $('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
+$('clear-modal').addEventListener('click', e => { 
+  if (e.target === $('clear-modal')) $('clear-modal').classList.remove('open'); 
+});
 loadData();
 </script>
 </body>
