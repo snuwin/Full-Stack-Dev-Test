@@ -164,6 +164,8 @@
   .step-btn.active { background: var(--gray-900); color: white; }
   .step-btn.done { color: var(--green-dark); background: var(--green-light); cursor: pointer; }
   .step-btn.done:hover { background: #d1ebe2; }
+  .step-btn.required { color: #991b1b; background: #fee2e2; border: 1.5px solid #fca5a5; }
+  .step-btn.required:hover { background: #fecaca; }
   .step-num {
     width: 20px; height: 20px;
     border-radius: 50%;
@@ -894,7 +896,12 @@ function goStep(n) {
   [1, 2, 3, 4].forEach(i => {
     $('step' + i).style.display = i === n ? 'block' : 'none';
     const btn = $('sn' + i);
-    btn.className = 'step-btn' + (i === n ? ' active' : i < n ? ' done' : '');
+    // Mark customer step red if navigating past it without a selection
+    if (i === 1 && i !== n && !state.cust) {
+      btn.className = 'step-btn required';
+    } else {
+      btn.className = 'step-btn' + (i === n ? ' active' : i < n ? ' done' : '');
+    }
   });
   if (n === 2) renderEquip();
   if (n === 3) renderLabor();
@@ -974,6 +981,7 @@ function selectCustomer(id) {
     </div>${warnHtml}`;
 
   $('btn-next1').disabled = false;
+  $('sn1').classList.remove('required');
   saveDraft();
 }
 
