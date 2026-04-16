@@ -782,8 +782,31 @@ const fmtDateTime = iso => new Date(iso).toLocaleString('en-US', {
 
 function highlight(text, query) {
   if (!query || !text) return text || '';
+  const str = String(text);
+  
+  // try direct match first
   const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-  return String(text).replace(re, '<mark>$1</mark>');
+  if (re.test(str)) return str.replace(re, '<mark>$1</mark>');
+  
+  // if query is all digits, try matching against stripped version
+  const digits = query.replace(/\D/g, '');
+  if (!digits) return str;
+  const strippedText = str.replace(/\D/g, '');
+  const idx = strippedText.indexOf(digits);
+  if (idx === -1) return str;
+  
+  // find the corresponding position in the original formatted string
+  let digitCount = 0;
+  let start = -1, end = -1;
+  for (let i = 0; i < str.length; i++) {
+    if (/\d/.test(str[i])) {
+      if (digitCount === idx) start = i;
+      if (digitCount === idx + digits.length - 1) { end = i + 1; break; }
+      digitCount++;
+    }
+  }
+  if (start === -1 || end === -1) return str;
+  return str.slice(0, start) + '<mark>' + str.slice(start, end) + '</mark>' + str.slice(end);
 }
 
 function retailPrice(equip) {
