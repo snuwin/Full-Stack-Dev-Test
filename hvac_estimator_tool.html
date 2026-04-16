@@ -714,6 +714,20 @@
   </div>
 </div>
 
+<!-- NO CUSTOMER WARNING MODAL -->
+<div class="modal-bg" id="no-customer-modal">
+  <div class="modal" style="max-width: 360px; text-align: center;">
+    <h2>No customer selected</h2>
+    <p style="font-size: 14px; color: var(--gray-500); margin-bottom: 20px;">Please select a customer in Step 1 before continuing.</p>
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn btn-dark" onclick="$('no-customer-modal').classList.remove('open'); goStep(1);">Go to Step 1</button>
+      <button class="btn" onclick="$('no-customer-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1315,8 +1329,7 @@ function buildQuoteText() {
 
 function showQuoteModal() {
   if (!state.cust) {
-    alert('Please select a customer before viewing the quote.');
-    goStep(1);
+    $('no-customer-modal').classList.add('open');    
     return;
   }
   $('quote-text-content').textContent = buildQuoteText();
@@ -1360,8 +1373,7 @@ function printQuote() {
 // ─────────────────────────────────────────────────────────────────────────────
 function finalizeQuote() {
   if (!state.cust) {
-    alert('Please select a customer before finalizing.');
-    goStep(1);
+    $('no-customer-modal').classList.add('open');    
     return;
   }
   
