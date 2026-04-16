@@ -1436,6 +1436,8 @@ function finalizeQuote() {
   
   setTimeout(() => {
     dot.classList.remove('show');
+    btn.textContent = 'Save & finalize'; 
+    btn.disabled = false;               
     state.cust = null;
     state.eCart = {};
     state.lCart = {};
