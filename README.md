@@ -38,14 +38,14 @@ The problem was clear: techs needed a faster way to quote on-site. I made a few 
 
 
 ## Getting Started
-1. git clone https://github.com/yourname/Full-Stack-Dev-Test.git
+1. git clone https://github.com/snuwin/Full-Stack-Dev-Test.git
 2. cd Full-Stack-Dev-Test
 3. python -m http.server 8000
 4. Open "http://localhost:8000/hvac_estimator_tool.html" in a browser.
 
-Note: Note: The clean data in data/clean/ is already generated. If you update the raw data in data/, run python normalize_data.py to regenerate it.
+Note: The clean data in data/clean/ is already generated. If you update the raw data in data/, run python normalize_data.py to regenerate it.
 
-### Data Pipeline
+## Data Pipeline
 Raw JSON files in data/ are normalized by normalize_data.py before the app loads them from data/clean/:
 - Standardizes field names (snake_case → camelCase)
 - Applies per-category markup to compute _retailPrice for each equipment item
@@ -98,7 +98,7 @@ python normalize_data.py
 - View, delete per entry, or clear all with confirmation modal
 - Timestamps and item summaries per quote
 
-### Planned for V2
+## Planned for V2
 - Backend API to sync quotes across devices and technicians
 - Per-technician authentication
 - Admin panel for updating pricing without code changes
@@ -106,7 +106,7 @@ python normalize_data.py
 - Inline quantity editing on the quote screen
 - Pagination for larger customer and equipment lists
 
-### Tech Stack
+## Tech Stack
 - Vanilla HTML, CSS, JavaScript — no frameworks, no build step
 - localStorage for draft persistence and quote history
 - Python data normalization pipeline (normalize_data.py)
