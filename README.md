@@ -1,29 +1,94 @@
-# Field Estimate Tool
+# HVAC Field Estimator
+> A 4-step quote tool for HVAC field technicians, optimized for mobile and tablet use in the field. Select a customer, build a parts and labor estimate, and generate a printable quote — in under 2 minutes.
+
+## Author(s)
+Serena Nguyen
+
+## Demo
+[Youtube Demo] __________
 
 ## The Problem
+Technicians were spending 10–45 minutes per estimate on-site, manually cross-referencing equipment binders, labor rate sheets, and customer records. Customers waited. Estimates were inconsistent. Jobs were lost to competitors who quoted faster.
 
-Our HVAC technicians are losing time on every service call.
+This tool puts everything a tech needs in one place, optimized for phone and tablet use in the field — reducing estimate time to under 2 minutes.
 
-Right now, when a tech gets to a job site and needs to give the customer an estimate, here's what happens: they flip through a product binder or scroll through a spreadsheet on their phone, look up equipment costs, try to remember the labor rates for different job types, factor in the specifics of the property, and then scribble numbers on a notepad or punch them into a calculator. Sometimes they call the office to double-check pricing. Sometimes they guess and adjust later.
+## My Approach & Why
+The problem was clear: techs needed a faster way to quote on-site. I made a few deliberate choices:
+> No framework (vanilla JS) — A React or Vue app would require a build step and npm install. A tech or manager cloning this repo to evaluate or deploy it shouldn't need a Node environment. Vanilla JS meant zero dependencies and instant run from a static server.
+> Data pipeline separate from the UI — Pricing changes are a business operation, not a code change. By keeping normalize_data.py as the single source of truth for clean data, whoever manages pricing can update the raw JSON and regenerate without touching the app.
+> localStorage over a backend — For a single-tech workflow, localStorage gives crash recovery (accidental refresh, tab close) with zero infrastructure. A tech in the field doesn't need their draft synced to a server — they need it to survive a phone restart.
+> 4-step guided flow over a single form — Breaking the estimate into Customer → Equipment → Labor → Quote mirrors how a tech actually thinks on a job site. It also makes validation natural — you can't finalize without a customer, and each step builds on the last.
+> Per-category markup in the pipeline — Capacitors and thermostats carry higher margins than full AC units in real HVAC businesses. Hardcoding a flat markup would have been simpler but less accurate to how the business actually prices jobs.
+## Getting Started
+1. git clone https://github.com/yourname/Full-Stack-Dev-Test.git
+2. cd Full-Stack-Dev-Test
+3. python -m http.server 8000
+4. Open "http://localhost:8000/hvac_estimator_tool.html" in a browser.
+Note: Note: The clean data in data/clean/ is already generated. If you update the raw data in data/, run python normalize_data.py to regenerate it.
 
-The customer is standing there the whole time.
+### Data Pipeline
+Raw JSON files in data/ are normalized by normalize_data.py before the app loads them from data/clean/:
+- Standardizes field names (snake_case → camelCase)
+- Applies per-category markup to compute _retailPrice for each equipment item
+- Flags data quality issues (missing phone, unknown system age, no last service date)
+- Embeds tax rate and catalog freshness timestamp into meta.json
 
-A simple repair estimate might take 10-15 minutes. A full system replacement quote can take 30-45 minutes on-site, and that's before the tech has to go back to their truck to write it up in a way the customer can actually read. Some techs text a photo of their handwritten notes to the office and have someone there type it up. Others just wing it and send a "real" estimate later that evening.
+#### Run in terminal:
+python normalize_data.py
 
-We've got about 40 technicians in the field. If each one does 4-6 estimates a day, that's a lot of wasted time — and a lot of customers standing around waiting. We've heard from customers that the wait makes the whole experience feel less professional, and we've definitely lost jobs because a competitor got a clean estimate out faster.
+## How It Works
 
-## What We Have
+### Header
+- Displays catalog freshness date so techs know if pricing is current
+- Estimate tab for building new quotes, History tab for saved quotes
+- Step progress bar: green = complete, black = current, red = required but incomplete
 
-In the `data/` folder, you'll find some of the information our techs work with:
+### Step 1 -- Find Customer
+- Full-text search across name, address, and phone number with substring matching and result ranking
+- Digit-only search strips formatting so typing 2175550391 matches (217) 555-0391
+- Selecting a customer reveals property details: system type, property type, square footage, system age, and last service date
+- Systems 15+ years old trigger an advisory warning to discuss system health on the visit
+- Customer cards display Commercial and System Age badges for quick visual scanning
+- Continue button is disabled until a customer is selected
 
-- **equipment.json** — Our catalog of HVAC equipment and parts with pricing
-- **labor_rates.json** — What we charge for different types of work
-- **customers.json** — A sample of customer and property records
+### Step 2 -- Equipment & Parts Catalog
+- Scrollable category filter pills with arrow buttons for mobile navigation
+- Full catalog displayed on load — no extra taps needed
+- Search by name, brand, or model number
+- (+ / −) quantity steppers per item
+- Prices reflect per-category markup applied during the data normalization pipeline
 
-This is real-ish data pulled from our systems. It's not perfect — some of it was exported from different tools at different times, so it might not all look the same.
+### Step 3 -- Labor Charges
+- All labor types and rates pulled from labor_rates.json
+- Typical min/max hour ranges shown as reference
+- Hours adjusted in 0.5 increments via stepper buttons — input is readonly to prevent mobile keyboard
+- Live price updates as hours change
+- Optional tech notes field for observations and recommendations
 
-## What We're Asking
+### Step 4 -- Build Quote
+- Summary cards for Parts, Labor, and Total + Tax
+- Pricing tier selector: Standard (full retail), Preferred (10% off), Commercial (13% off)
+- Line items with individual removal
+- Totals breakdown: subtotal, tax (9.75% Springfield IL), and grand total
+- View Printable Quote — formatted receipt modal with copy to clipboard and print/save PDF
+- Save & Finalize — saves to local history, resets state, returns to Step 1
+- Clear Quote — confirmation modal before wiping the current estimate
 
-Build something that helps.
+### History
+- All finalized quotes saved to localStorage
+- View, delete per entry, or clear all with confirmation modal
+- Timestamps and item summaries per quote
 
-Fork this repo, build your solution, and include a short write-up explaining your approach — what you built, why you made the choices you did, and what you'd do differently with more time.
+### Planned for V2
+- Backend API to sync quotes across devices and technicians
+- Per-technician authentication
+- Admin panel for updating pricing without code changes
+- PWA support for true offline use and home screen install
+- Inline quantity editing on the quote screen
+- Pagination for larger customer and equipment lists
+
+### Tech Stack
+- Vanilla HTML, CSS, JavaScript — no frameworks, no build step
+- localStorage for draft persistence and quote history
+- Python data normalization pipeline (normalize_data.py)
+- Fully functional after git clone with no npm install or build process
