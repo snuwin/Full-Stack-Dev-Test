@@ -732,7 +732,17 @@
   </div>
 </div>
 
-
+<!-- CLEAR ALL HISTORY CONFIRM MODAL -->
+<div class="modal-bg" id="clear-history-modal">
+  <div class="modal" style="max-width: 360px; text-align: center;">
+    <h2>Clear all quotes?</h2>
+    <p style="font-size: 14px; color: var(--gray-500); margin-bottom: 20px;">All saved quotes will be permanently deleted.</p>
+    <div class="modal-actions" style="justify-content: center;">
+      <button class="btn btn-red" onclick="executeHardClearHistory()">Yes, clear all</button>
+      <button class="btn" onclick="$('clear-history-modal').classList.remove('open')">Cancel</button>
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -1023,7 +1033,11 @@ function deleteHistoryEntry(i) {
 }
 
 function clearHistory() {
-  if (!confirm('Clear all saved quotes?')) return;
+  $('clear-history-modal').classList.add('open');
+}
+
+function executeHardClearHistory() {
+  $('clear-history-modal').classList.remove('open');
   localStorage.removeItem(HISTORY_KEY);
   renderHistory();
 }
@@ -1482,6 +1496,7 @@ $('modal').addEventListener('click', e => { if (e.target === $('modal')) closeMo
 $('clear-modal').addEventListener('click', e => { 
   if (e.target === $('clear-modal')) $('clear-modal').classList.remove('open'); 
 });
+$('clear-history-modal').addEventListener('click', e => { if (e.target === $('clear-history-modal')) $('clear-history-modal').classList.remove('open'); });
 loadData();
 </script>
 </body>
