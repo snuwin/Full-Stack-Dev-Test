@@ -42,6 +42,7 @@ The problem was clear: techs needed a faster way to quote on-site. I made a few 
 2. cd Full-Stack-Dev-Test
 3. python -m http.server 8000
 4. Open "http://localhost:8000/hvac_estimator_tool.html" in a browser.
+
 Note: Note: The clean data in data/clean/ is already generated. If you update the raw data in data/, run python normalize_data.py to regenerate it.
 
 ### Data Pipeline
