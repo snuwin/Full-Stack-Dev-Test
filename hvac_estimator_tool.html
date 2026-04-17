@@ -1235,6 +1235,13 @@ function renderLabor() {
 function setHrs(id, val, el) {
   const num = Math.round(parseFloat(val) * 2) / 2; // snap to 0.5
   state.lCart[id] = num > 0 ? num : '';
+  if (num <= 0) {
+    delete state.lCart[id];  // remove entirely instead of setting to ''
+  } else {
+    state.lCart[id] = num;
+  }
+  
+  
   saveDraft();
   // re-render so stepper buttons reflect new value
   if (!el) renderLabor();
