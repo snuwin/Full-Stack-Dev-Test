@@ -36,7 +36,11 @@
     --mono: 'DM Mono', monospace;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; max-width: 100%; }
+
+  html, body {
+    width: 100%;
+  }
 
   body {
     font-family: var(--font);
@@ -58,6 +62,8 @@
     min-height: 52px;
     position: sticky; 
     gap: 8px;
+    top: 0;
+    z-index: 1]00;
     
   }
   .app-header-left { 
@@ -1436,14 +1442,17 @@ function finalizeQuote() {
   
   setTimeout(() => {
     dot.classList.remove('show');
-    btn.textContent = 'Save & finalize'; 
-    btn.disabled = false;               
+    btn.textContent = 'Save & finalize';
+    btn.disabled = false;
     state.cust = null;
     state.eCart = {};
     state.lCart = {};
     state.marginTier = 'standard';
     $('tech-notes').value = '';
     $('csearch').value = '';
+    $('cdetail-panel').style.display = 'none';  
+    $('btn-next1').disabled = true;           
+    renderCustomers();                          
     showView('estimate');
     goStep(1);
   }, 1500);
