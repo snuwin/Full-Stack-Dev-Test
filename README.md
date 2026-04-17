@@ -14,11 +14,21 @@ This tool puts everything a tech needs in one place, optimized for phone and tab
 
 ## My Approach & Why
 The problem was clear: techs needed a faster way to quote on-site. I made a few deliberate choices:
-> No framework (vanilla JS) — A React or Vue app would require a build step and npm install. A tech or manager cloning this repo to evaluate or deploy it shouldn't need a Node environment. Vanilla JS meant zero dependencies and instant run from a static server.
-> Data pipeline separate from the UI — Pricing changes are a business operation, not a code change. By keeping normalize_data.py as the single source of truth for clean data, whoever manages pricing can update the raw JSON and regenerate without touching the app.
-> localStorage over a backend — For a single-tech workflow, localStorage gives crash recovery (accidental refresh, tab close) with zero infrastructure. A tech in the field doesn't need their draft synced to a server — they need it to survive a phone restart.
-> 4-step guided flow over a single form — Breaking the estimate into Customer → Equipment → Labor → Quote mirrors how a tech actually thinks on a job site. It also makes validation natural — you can't finalize without a customer, and each step builds on the last.
-> Per-category markup in the pipeline — Capacitors and thermostats carry higher margins than full AC units in real HVAC businesses. Hardcoding a flat markup would have been simpler but less accurate to how the business actually prices jobs.
+
+**No framework (vanilla JS)** — A React or Vue app would require a build step and npm install. A tech or manager cloning this repo to evaluate or deploy it shouldn't need a Node environment. Vanilla JS meant zero dependencies and instant run from a static server.
+**Data pipeline separate from the UI** — Pricing changes are a business operation, not a code change. By keeping normalize_data.py as the single source of truth for clean data, whoever manages pricing can update the raw JSON and regenerate without touching the app.
+**localStorage over a backend** — For a single-tech workflow, localStorage gives crash recovery (accidental refresh, tab close) with zero infrastructure. A tech in the field doesn't need their draft synced to a server — they need it to survive a phone restart.
+**4-step guided flow over a single form** — Breaking the estimate into Customer → Equipment → Labor → Quote mirrors how a tech actually thinks on a job site. It also makes validation natural — you can't finalize without a customer, and each step builds on the last.
+**Per-category markup in the pipeline** — Capacitors and thermostats carry higher margins than full AC units in real HVAC businesses. Hardcoding a flat markup would have been simpler but less accurate to how the business actually prices jobs.
+
+## What I'd Do Differently With More Time
+**Backend API** — localStorage means quotes live on one device. A simple API would let quotes sync across a team of 40 technicians and give the office visibility into what's been quoted in the field
+**Authentication** — each tech should have their own history, not a shared device history
+**Admin pricing panel** — right now updating prices means editing JSON files. A simple admin UI would let a manager update markup and labor rates without touching code
+**PWA** — adding a service worker would make the app fully offline-capable and installable on a phone home screen, which is the ideal field experience
+**Tests** — the pricing and calculation functions (calcTotals, retailPrice) are the core of the app and should have unit tests to catch regressions
+
+
 ## Getting Started
 1. git clone https://github.com/yourname/Full-Stack-Dev-Test.git
 2. cd Full-Stack-Dev-Test
