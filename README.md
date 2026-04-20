@@ -5,7 +5,7 @@
 Serena Nguyen
 
 ## Demo
-[Google Drive Demo Link]https://drive.google.com/file/d/1tydVMUEM5inrMtOmRhLPmAhuaG0JZO3a/view?usp=sharing
+[Google Drive Demo Link](https://drive.google.com/file/d/1tydVMUEM5inrMtOmRhLPmAhuaG0JZO3a/view?usp=sharing)
 
 ## The Problem
 Technicians were spending 10–45 minutes per estimate on-site, manually cross-referencing equipment binders, labor rate sheets, and customer records. Customers waited. Estimates were inconsistent. Jobs were lost to competitors who quoted faster.
