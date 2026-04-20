@@ -13,29 +13,20 @@ Technicians were spending 10–45 minutes per estimate on-site, manually cross-r
 This tool puts everything a tech needs in one place, optimized for phone and tablet use in the field — reducing estimate time to under 2 minutes.
 
 ## My Approach & Why
-The problem was clear: techs needed a faster way to quote on-site. I made a few deliberate choices:
 
-**No framework (vanilla JS)** — A React or Vue app would require a build step and npm install. A tech or manager cloning this repo to evaluate or deploy it shouldn't need a Node environment. Vanilla JS meant zero dependencies and instant run from a static server.
+The core constraint was speed in the field — technicians need to generate accurate estimates with minimal friction while standing in front of a customer. Every decision in this tool prioritizes reducing time-to-quote while keeping the workflow intuitive and reliable.
 
-**Data pipeline separate from the UI** — Pricing changes are a business operation, not a code change. By keeping normalize_data.py as the single source of truth for clean data, whoever manages pricing can update the raw JSON and regenerate without touching the app.
+While this implementation is optimized for a single-tech workflow, I intentionally avoided introducing a backend at this stage to reduce complexity and ensure reliability in field conditions. If deployed across a 40-tech team, I would prioritize introducing a lightweight backend API for quote syncing and reporting, starting with a simple REST service and shared datastore, and layering in authentication and admin tooling as the system scales.
 
-**localStorage over a backend** — For a single-tech workflow, localStorage gives crash recovery (accidental refresh, tab close) with zero infrastructure. A tech in the field doesn't need their draft synced to a server — they need it to survive a phone restart.
+No framework (vanilla JS) — A React or Vue app would introduce a build step and dependency management. For this use case, a technician or manager should be able to clone the repo and run it immediately. Vanilla JS enables zero setup and instant execution from a static server.
 
-**4-step guided flow over a single form** — Breaking the estimate into Customer → Equipment → Labor → Quote mirrors how a tech actually thinks on a job site. It also makes validation natural — you can't finalize without a customer, and each step builds on the last.
+Data pipeline separate from the UI — Pricing changes are a business operation, not a code change. By keeping normalize_data.py as the single source of truth, raw data can be updated and reprocessed without modifying the application logic.
 
-**Per-category markup in the pipeline** — Capacitors and thermostats carry higher margins than full AC units in real HVAC businesses. Hardcoding a flat markup would have been simpler but less accurate to how the business actually prices jobs.
+localStorage over a backend — For a single-tech workflow, localStorage provides instant persistence and crash recovery (e.g., refresh, tab close, or device interruption) without requiring network access or infrastructure. In field environments, reliability and speed take priority over cross-device syncing.
 
-## What I'd Do Differently With More Time
-**Backend API** — localStorage means quotes live on one device. A simple API would let quotes sync across a team of 40 technicians and give the office visibility into what's been quoted in the field.
+4-step guided flow over a single form — Structuring the process as Customer → Equipment → Labor → Quote mirrors how technicians think during a job. This reduces cognitive load and enables natural validation at each step.
 
-**Authentication** — Each tech should have their own history, not a shared device history.
-
-**Admin pricing panel** — right now updating prices means editing JSON files. A simple admin UI would let a manager update markup and labor rates without touching code.
-
-**PWA** — Adding a service worker would make the app fully offline-capable and installable on a phone home screen, which is the ideal field experience.
-
-**Tests** — The pricing and calculation functions (calcTotals, retailPrice) are the core of the app and should have unit tests to catch regressions.
-
+Per-category markup in the pipeline — Different equipment categories carry different margins in real HVAC businesses. Applying markup during data normalization ensures pricing reflects real-world practices while keeping the frontend logic simple.
 
 ## Getting Started
 1. git clone https://github.com/snuwin/Full-Stack-Dev-Test.git
